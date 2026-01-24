@@ -1,35 +1,28 @@
 package io.github.siakhooi.jexl.executor;
 
+
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class ResultPathTest {
-    @Test
-    void testGetWithExtension() {
-        String scriptFilePath = "/path/to/script.jexl";
-        String template = "/tmp/{name}.result.json";
-        String[] result = ResultPath.get(scriptFilePath, template);
-        assertArrayEquals(new String[]{"/tmp/script", "result", "json"}, result);
+    static Stream<org.junit.jupiter.params.provider.Arguments> provideScriptFilePathAndExpected() {
+        return Stream.of(
+            org.junit.jupiter.params.provider.Arguments.of("/path/to/script.jexl", "/tmp/{name}.result.json", new String[]{"/tmp/script", "result", "json"}),
+            org.junit.jupiter.params.provider.Arguments.of("/path/to/script", "/tmp/{name}.result.json", new String[]{"/tmp/script", "result", "json"}),
+            org.junit.jupiter.params.provider.Arguments.of("/path/to/my.script.jexl", "/tmp/{name}.result.json", new String[]{"/tmp/my", "script", "result", "json"})
+        );
     }
 
-    @Test
-    void testGetWithoutExtension() {
-        String scriptFilePath = "/path/to/script";
-        String template = "/tmp/{name}.result.json";
+    @ParameterizedTest
+    @MethodSource("provideScriptFilePathAndExpected")
+    void testGetParameterized(String scriptFilePath, String template, String[] expected) {
         String[] result = ResultPath.get(scriptFilePath, template);
-        assertArrayEquals(new String[]{"/tmp/script", "result", "json"}, result);
-    }
-
-    @Test
-    void testGetWithMultipleDots() {
-        String scriptFilePath = "/path/to/my.script.jexl";
-        String template = "/tmp/{name}.result.json";
-        String[] result = ResultPath.get(scriptFilePath, template);
-        // Print for debug
-        System.out.println(java.util.Arrays.toString(result));
-        // The actual output is ["/tmp/my", "script", "result", "json"]
-        assertArrayEquals(new String[]{"/tmp/my", "script", "result", "json"}, result);
+        assertArrayEquals(expected, result);
     }
 
     @Test

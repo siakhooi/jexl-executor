@@ -14,9 +14,7 @@ public class ResultPath {
         }
 
         String resultPath = resultPathTemplate.replace("{name}", basename);
-        String[] pathParts = resultPath.split("\\.");
-        return pathParts;
-
+        return resultPath.split("\\.");
     }
 
 }

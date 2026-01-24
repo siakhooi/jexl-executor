@@ -11,6 +11,8 @@ import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.MapContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -18,6 +20,7 @@ import picocli.CommandLine.Parameters;
 
 @Command(name = "jexl-executor", mixinStandardHelpOptions = true, version = Version.APPLICATION_VERSION, description = "Execute JEXL scripts with JSON context in a chain")
 public class JexlExecutor implements Callable<Integer> {
+    private static final Logger logger = LoggerFactory.getLogger(JexlExecutor.class);
 
     @Option(names = { "--result-path",
             "-r" }, defaultValue = "{name}", description = "Path template for results. Use {name} as placeholder for script basename (default: ${DEFAULT-VALUE}). Examples: {name}, output.{name}, results.{name}.data")
@@ -54,8 +57,7 @@ public class JexlExecutor implements Callable<Integer> {
 
             return 0;
         } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error: {}", e.getMessage(), e);
             return 1;
         }
     }
