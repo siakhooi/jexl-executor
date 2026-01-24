@@ -1,0 +1,7 @@
+Package: siakhooi-jexl-executor
+Version: 1.0.0
+Maintainer: Siak Hooi <siakhooi@gmail.com>
+Depends: default-jre-headless|openjdk-21-jre-headless|openjdk-22-jre-headless|openjdk-23-jre-headless
+Architecture: amd64
+Homepage: <https://github.com/siakhooi/jexl-executor>
+Description: jexl scripts executor

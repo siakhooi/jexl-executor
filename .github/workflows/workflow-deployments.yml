@@ -1,0 +1,27 @@
+name: Deployment
+on:
+  release:
+    types: [created]
+
+
+jobs:
+  build-with-quality-checks:
+    uses: ./.github/workflows/workflow-build-with-quality-checks.yml
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      QLTY_COVERAGE_TOKEN: ${{ secrets.QLTY_COVERAGE_TOKEN }}
+  release-assets:
+    needs: build-with-quality-checks
+    uses: ./.github/workflows/deploy-github-release-assets.yml
+    secrets:
+      TOKEN_TO_UPLOAD_ASSETS: ${{ secrets.TOKEN_TO_UPLOAD_ASSETS }}
+  siakhooi-apt:
+    needs: build-with-quality-checks
+    uses: ./.github/workflows/publish-to-siakhooi-apt.yml
+    secrets:
+      PUBLISH_TO_GITHUB_REPO_TOKEN: ${{ secrets.PUBLISH_TO_GITHUB_REPO_TOKEN }}
+  siakhooi-rpms:
+    needs: build-with-quality-checks
+    uses: ./.github/workflows/publish-to-siakhooi-rpms.yml
+    secrets:
+      PUBLISH_TO_GITHUB_REPO_TOKEN: ${{ secrets.PUBLISH_TO_GITHUB_REPO_TOKEN }}

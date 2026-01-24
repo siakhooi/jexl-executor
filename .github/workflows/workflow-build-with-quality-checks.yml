@@ -1,0 +1,34 @@
+name: Build and Test on Push
+on:
+  push:
+    branches:
+      - "*"
+  pull_request:
+    branches:
+      - "*"
+  workflow_call:
+    secrets:
+      SONAR_TOKEN:
+        required: true
+      QLTY_COVERAGE_TOKEN:
+        required: true
+
+jobs:
+  build-maven:
+    uses: ./.github/workflows/build-maven.yml
+  build-deb:
+    needs: build-maven
+    uses: ./.github/workflows/build-deb.yml
+  build-rpm:
+    needs: build-maven
+    uses: ./.github/workflows/build-rpm.yml
+  sonarcloud:
+    needs: [build-maven, build-deb]
+    uses: ./.github/workflows/quality-sonarcloud.yml
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  qltysh:
+    needs: [build-maven, build-deb]
+    uses: ./.github/workflows/quality-qltysh.yml
+    secrets:
+      QLTY_COVERAGE_TOKEN: ${{ secrets.QLTY_COVERAGE_TOKEN }}

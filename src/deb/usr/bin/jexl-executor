@@ -1,0 +1,6 @@
+#!/bin/bash
+
+readonly jarfile=/usr/lib/java/siakhooi/jexl-executor.jar
+
+# use system java
+/usr/bin/java -jar "$jarfile" "$@"
