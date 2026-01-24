@@ -1,0 +1,1 @@
+user.age >= 18 && user.active

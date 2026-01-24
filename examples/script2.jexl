@@ -1,0 +1,15 @@
+var subtotal = 0;
+for (var item : order.items) {
+  subtotal = subtotal + (item.price * item.quantity);
+}
+var afterDiscount = subtotal * (1 - order.discount);
+var tax = afterDiscount * constants.taxRate;
+var total = afterDiscount + tax;
+{
+  'subtotal': subtotal,
+  'discount': subtotal * order.discount,
+  'afterDiscount': afterDiscount,
+  'tax': tax,
+  'total': total,
+  'freeShipping': afterDiscount >= constants.shippingThreshold
+}

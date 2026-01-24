@@ -1,0 +1,21 @@
+{
+  "user": {
+    "name": "John Doe",
+    "age": 30,
+    "email": "john.doe@example.com",
+    "active": true
+  },
+  "order": {
+    "id": "ORD-12345",
+    "items": [
+      {"name": "Laptop", "price": 999.99, "quantity": 1},
+      {"name": "Mouse", "price": 29.99, "quantity": 2},
+      {"name": "Keyboard", "price": 79.99, "quantity": 1}
+    ],
+    "discount": 0.1
+  },
+  "constants": {
+    "taxRate": 0.08,
+    "shippingThreshold": 100
+  }
+}
