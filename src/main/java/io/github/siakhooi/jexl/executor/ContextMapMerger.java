@@ -11,10 +11,7 @@ public class ContextMapMerger {
         Map<String, Object> currentMap = contextMap;
         for (int i = 0; i < pathParts.length - 1; i++) {
             String part = pathParts[i];
-            if (!currentMap.containsKey(part)) {
-                currentMap.put(part, new HashMap<String, Object>());
-            }
-            Object next = currentMap.get(part);
+            Object next = currentMap.computeIfAbsent(part, k -> new HashMap<String, Object>());
             if (!(next instanceof Map)) {
                 Map<String, Object> newMap = new HashMap<>();
                 currentMap.put(part, newMap);

@@ -1,7 +1,5 @@
 package io.github.siakhooi.jexl.executor;
 
-import java.util.Map;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -10,9 +8,9 @@ public class Output {
     }
 
     @SuppressWarnings("java:S106")
-    public static void print(Map<String, Object> contextMap) throws JsonProcessingException {
+    public static void print(Object scriptResult) throws JsonProcessingException {
         ObjectMapper prettyMapper = new ObjectMapper();
-        String resultJson = prettyMapper.writerWithDefaultPrettyPrinter().writeValueAsString(contextMap);
+        String resultJson = prettyMapper.writerWithDefaultPrettyPrinter().writeValueAsString(scriptResult);
         System.out.println(resultJson);
     }
 }

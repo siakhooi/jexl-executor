@@ -3,6 +3,7 @@ package io.github.siakhooi.jexl.executor;
 import static io.github.siakhooi.jexl.executor.FileUtils.readFile;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -43,17 +44,19 @@ public class JexlExecutor implements Callable<Integer> {
 
             Map<String, Object> contextMap = ContextFileLoader.get(contextFile);
 
+            Object scriptResult= new HashMap<String, Object>();
+
             for (File scriptFile : scriptFiles) {
 
                 String jexlScript = readFile(scriptFile);
 
-                Object scriptResult = executeJexl(contextMap, jexlScript, classLoader);
+                scriptResult = executeJexl(contextMap, jexlScript, classLoader);
 
                 String[] pathParts = ResultPath.get(scriptFile.getAbsolutePath(), resultPathTemplate);
                 contextMap = ContextMapMerger.merge(contextMap, scriptResult, pathParts);
             }
 
-            Output.print(contextMap);
+            Output.print(scriptResult);
 
             return 0;
         } catch (Exception e) {
