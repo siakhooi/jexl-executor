@@ -1,6 +1,7 @@
 package io.github.siakhooi.jexl.executor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -10,11 +11,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+@DisplayName("ContextFileLoader Tests")
 class ContextFileLoaderTest {
     @Test
+    @DisplayName("Should successfully parse valid JSON content")
     void testGetValidJson(@TempDir Path tempDir) throws IOException {
         String json = "{" +
                 "\"a\": 1, " +
@@ -26,12 +30,13 @@ class ContextFileLoaderTest {
         Map<String, Object> map = ContextFileLoader.get(file);
         assertEquals(1, map.get("a"));
         assertEquals("text", map.get("b"));
-        assertTrue(map.get("c") instanceof Map);
-        Map<?, ?> c = (Map<?, ?>) map.get("c");
+        
+        Map<?, ?> c = assertInstanceOf(Map.class, map.get("c"));
         assertEquals(2, c.get("d"));
     }
 
     @Test
+    @DisplayName("Should parse empty JSON as empty map")
     void testGetEmptyJson(@TempDir Path tempDir) throws IOException {
         String json = "{}";
         File file = tempDir.resolve("empty.json").toFile();
@@ -41,6 +46,7 @@ class ContextFileLoaderTest {
     }
 
     @Test
+    @DisplayName("Should throw IOException for invalid JSON")
     void testGetInvalidJson(@TempDir Path tempDir) throws IOException {
         String json = "{invalid json}";
         File file = tempDir.resolve("bad.json").toFile();
