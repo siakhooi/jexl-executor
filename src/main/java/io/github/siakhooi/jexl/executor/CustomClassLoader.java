@@ -32,7 +32,7 @@ public class CustomClassLoader {
                 continue;
             }
             urls.add(jarFile.toURI().toURL());
-            logger.info("Loaded JAR: {}", jarPath);
+            logger.debug("Loaded JAR: {}", jarPath);
         }
 
         return new URLClassLoader(urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
