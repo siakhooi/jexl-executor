@@ -23,7 +23,8 @@ build-deb:
 	scripts/build-deb.sh
 build-rpms:
 	scripts/build-rpms.sh
-
+run:
+	java -jar target/jexl-executor.jar
 qlty-check:
 	qlty check --all
 

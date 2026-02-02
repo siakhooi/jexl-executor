@@ -37,14 +37,18 @@ public class JexlExecutor implements Callable<Integer> {
     @Parameters(index = "1..*", arity = "1..*", description = "JEXL script files to execute in sequence")
     private List<File> scriptFiles;
 
+    @Option(names = { "--debug" }, description = "Enable debug mode")
+    private boolean debug;
+
     @Override
     public Integer call() throws Exception {
+        LogLevelUtil.setRootLogLevelDebug(debug);
         try {
             ClassLoader classLoader = ApplicationClassLoader.get(jarListFile);
 
             Map<String, Object> contextMap = ContextFileLoader.get(contextFile);
 
-            Object scriptResult= new HashMap<String, Object>();
+            Object scriptResult = new HashMap<String, Object>();
 
             for (File scriptFile : scriptFiles) {
 
