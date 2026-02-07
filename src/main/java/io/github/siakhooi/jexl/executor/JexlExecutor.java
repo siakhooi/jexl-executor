@@ -1,20 +1,18 @@
 package io.github.siakhooi.jexl.executor;
 
 import static io.github.siakhooi.jexl.executor.FileUtils.readFile;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.MapContext;
+import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -70,7 +68,8 @@ public class JexlExecutor implements Callable<Integer> {
     }
 
     private static Object executeJexl(Map<String, Object> contextMap, String jexlScript, ClassLoader classLoader) {
-        JexlEngine jexl = new JexlBuilder().loader(classLoader).create();
+        JexlPermissions permissions = JexlPermissions.UNRESTRICTED;
+        JexlEngine jexl = new JexlBuilder().loader(classLoader).permissions(permissions).create();
         JexlContext context = new MapContext(contextMap);
 
         var script = jexl.createScript(jexlScript);
