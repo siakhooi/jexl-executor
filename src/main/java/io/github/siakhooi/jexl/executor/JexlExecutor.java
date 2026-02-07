@@ -16,6 +16,8 @@ import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.siakhooi.jexl.executor.config.ExecutionPlan;
+import io.github.siakhooi.jexl.executor.config.ExecutionStep;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -51,15 +53,18 @@ public class JexlExecutor implements Callable<Integer> {
 
             Object scriptResult = new HashMap<String, Object>();
 
-            for (File scriptFile : scriptFiles) {
+            ExecutionPlan executionPlan = ExecutionPlanUtil.loadExecutionPlan(scriptFiles);
 
-                String jexlScript = readFile(scriptFile);
+            for(ExecutionStep step : executionPlan.getSteps()) {
+                logger.debug("Executing step: {}", step.name());
+                String jexlScript = readFile(step.scriptFile());
+
                 logger.debug("jexlScript: {}", jexlScript);
 
                 scriptResult = executeJexl(contextMap, jexlScript, classLoader);
                 logger.debug("scriptResult: {}", scriptResult);
 
-                String[] pathParts = ResultPath.get(scriptFile.getAbsolutePath(), resultPathTemplate);
+                String[] pathParts = ResultPath.get(step.name(), resultPathTemplate);
                 contextMap = ContextMapMerger.merge(contextMap, scriptResult, pathParts);
                 logger.debug("result contextMap: {}", contextMap);
             }

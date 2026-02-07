@@ -13,37 +13,46 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 @DisplayName("ResultPath Tests")
 class ResultPathTest {
-    static Stream<Arguments> provideScriptFilePathAndExpected() {
+    static Stream<Arguments> provideNameAndExpected() {
         return Stream.of(
-            Arguments.of("/path/to/script.jexl", "/tmp/{name}.result.json", new String[]{"/tmp/script", "result", "json"}),
-            Arguments.of("/path/to/script", "/tmp/{name}.result.json", new String[]{"/tmp/script", "result", "json"}),
-            Arguments.of("/path/to/my.script.jexl", "/tmp/{name}.result.json", new String[]{"/tmp/my", "script", "result", "json"})
+            Arguments.of("script", "/tmp/{name}.result.json", new String[]{"/tmp/script", "result", "json"}),
+            Arguments.of("myfile", "/output/{name}.out.txt", new String[]{"/output/myfile", "out", "txt"}),
+            Arguments.of("test", "{name}.json", new String[]{"test", "json"})
         );
     }
 
-    @ParameterizedTest(name = "{0} with template {1}")
-    @MethodSource("provideScriptFilePathAndExpected")
-    @DisplayName("Should parse script path with template placeholder")
-    void testGetParameterized(String scriptFilePath, String template, String[] expected) {
-        String[] result = ResultPath.get(scriptFilePath, template);
+    @ParameterizedTest(name = "name={0} with template {1}")
+    @MethodSource("provideNameAndExpected")
+    @DisplayName("Should replace name placeholder and split by dots")
+    void testGetParameterized(String name, String template, String[] expected) {
+        String[] result = ResultPath.get(name, template);
         assertArrayEquals(expected, result);
     }
 
     @Test
     @DisplayName("Should parse path without name placeholder")
     void testGetWithNoNamePlaceholder() {
-        String scriptFilePath = "/path/to/script.jexl";
+        String name = "script";
         String template = "/tmp/result.json";
-        String[] result = ResultPath.get(scriptFilePath, template);
+        String[] result = ResultPath.get(name, template);
         assertArrayEquals(new String[]{"/tmp/result", "json"}, result);
     }
 
     @Test
-    @DisplayName("Should handle dots in directory path")
-    void testGetWithDotInPath() {
-        String scriptFilePath = "/path.to/script.jexl";
+    @DisplayName("Should handle multiple name placeholders")
+    void testGetWithMultipleNamePlaceholders() {
+        String name = "data";
+        String template = "/output/{name}/{name}.result.json";
+        String[] result = ResultPath.get(name, template);
+        assertArrayEquals(new String[]{"/output/data/data", "result", "json"}, result);
+    }
+
+    @Test
+    @DisplayName("Should handle name with special characters")
+    void testGetWithSpecialCharactersInName() {
+        String name = "my-file_v1";
         String template = "/tmp/{name}.result.json";
-        String[] result = ResultPath.get(scriptFilePath, template);
-        assertArrayEquals(new String[]{"/tmp/script", "result", "json"}, result);
+        String[] result = ResultPath.get(name, template);
+        assertArrayEquals(new String[]{"/tmp/my-file_v1", "result", "json"}, result);
     }
 }

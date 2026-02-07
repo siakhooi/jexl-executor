@@ -1,19 +1,12 @@
 package io.github.siakhooi.jexl.executor;
 
-import java.nio.file.Paths;
-
 public class ResultPath {
     private ResultPath() {
     }
 
-    static String[] get(String scriptFilePath, String resultPathTemplate) {
-        String basename = Paths.get(scriptFilePath).getFileName().toString();
-        int dotIndex = basename.lastIndexOf('.');
-        if (dotIndex > 0) {
-            basename = basename.substring(0, dotIndex);
-        }
+    static String[] get(String name, String resultPathTemplate) {
 
-        String resultPath = resultPathTemplate.replace("{name}", basename);
+        String resultPath = resultPathTemplate.replace("{name}", name);
         return resultPath.split("\\.");
     }
 
