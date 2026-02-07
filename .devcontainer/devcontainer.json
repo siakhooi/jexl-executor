@@ -6,17 +6,26 @@
   "updateRemoteUserUID": true,
   "features": {},
   "mounts": [
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.m2,target=/home/maui/.m2,type=bind,consistency=cached",    "source=/mnt/c/Users/sing/Documents/artifacts,target=/artifacts,type=bind,consistency=cached",
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
   ],
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-vscode.makefile-tools",
+        "github.copilot",
+        "github.copilot-chat",
+        "lfm.vscode-makefile-term",
         "vscjava.vscode-java-pack",
+        "NicolasVuillamy.vscode-groovy-lint",
+        "marlon407.code-groovy",
+        "vscjava.vscode-spring-initializr",
+        "vscjava.vscode-spring-boot-dashboard",
+        "humao.rest-client",
+        "ms-vscode.live-server",
         "redhat.vscode-xml",
         "redhat.vscode-yaml",
-        "ms-vscode.live-server",
-        "github.copilot",
-        "github.copilot-chat"
+        "tim-koehler.helm-intellisense",
+        "github.vscode-github-actions"
       ]
     }
   },
