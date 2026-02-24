@@ -3,7 +3,6 @@ package io.github.siakhooi.jexl.executor;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
-
 import io.github.siakhooi.jexl.executor.config.ExecutionPlan;
 import io.github.siakhooi.jexl.executor.config.ExecutionStep;
 import io.github.siakhooi.jexl.executor.config.ExecutionType;
@@ -28,7 +27,7 @@ public class ExecutionPlanUtil {
                 .map(file -> new ExecutionStep(
                         getBaseName(file.getAbsolutePath()),
                         file,
-                        ExecutionType.JEXL_SCRIPT))
+                        ExecutionType.JEXL))
                 .toList();
         executionPlan.setSteps(steps);
         return executionPlan;
