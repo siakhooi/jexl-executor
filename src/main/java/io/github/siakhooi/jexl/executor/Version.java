@@ -4,5 +4,5 @@ public class Version {
     private Version() {
     }
 
-    static final String APPLICATION_VERSION = "1.0.0";
+    static final String APPLICATION_VERSION = "1.1.0";
 }
