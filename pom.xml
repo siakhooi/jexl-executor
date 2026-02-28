@@ -29,7 +29,7 @@
     <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
     <maven-install-plugin.version>3.1.4</maven-install-plugin.version>
     <slf4j-api.version>2.0.17</slf4j-api.version>
-    <jackson-databind.version>2.21.0</jackson-databind.version>
+    <jackson-databind.version>2.21.1</jackson-databind.version>
     <picocli.version>4.7.7</picocli.version>
     <junit.version>6.0.3</junit.version>
 
