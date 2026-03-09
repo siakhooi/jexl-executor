@@ -1,11 +1,13 @@
 package io.github.siakhooi.jexl.executor;
 
 import static io.github.siakhooi.jexl.executor.FileUtils.readFile;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
@@ -13,6 +15,7 @@ import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import io.github.siakhooi.jexl.executor.config.ExecutionPlan;
 import io.github.siakhooi.jexl.executor.config.ExecutionStep;
 import io.github.siakhooi.jexl.executor.config.ExecutionType;
@@ -53,19 +56,19 @@ public class JexlExecutor implements Callable<Integer> {
 
             ExecutionPlan executionPlan = ExecutionPlanUtil.loadExecutionPlan(scriptFiles);
 
-            for(ExecutionStep step : executionPlan.getSteps()) {
+            for (ExecutionStep step : executionPlan.getSteps()) {
                 logger.debug("Executing step: {}", step.name());
                 String jexlScript = readFile(step.scriptFile());
 
                 logger.debug("jexlScript: {}", jexlScript);
 
-                if(step.executionType() == ExecutionType.JEXL) {
+                if (step.executionType() == ExecutionType.JEXL) {
 
                     scriptResult = executeJexl(contextMap, jexlScript, classLoader);
-                    logger.debug("scriptResult: {}", scriptResult);
-                } else if(step.executionType() == ExecutionType.JSON) {
+                    logger.debug("scriptResult: {}", JsonUtils.toJsonString(scriptResult));
+                } else if (step.executionType() == ExecutionType.JSON) {
                     scriptResult = JsonUtils.parseJson(jexlScript);
-                    logger.debug("scriptResult: {}", scriptResult);
+                    logger.debug("scriptResult: {}", JsonUtils.toJsonString(scriptResult));
                 } else {
                     logger.warn("Unknown execution type for step '{}', skipping execution", step.name());
                     continue;
@@ -73,7 +76,7 @@ public class JexlExecutor implements Callable<Integer> {
 
                 String[] pathParts = ResultPath.get(step.name(), resultPathTemplate);
                 contextMap = ContextMapMerger.merge(contextMap, scriptResult, pathParts);
-                logger.debug("result contextMap: {}", contextMap);
+                logger.debug("result context: {}", JsonUtils.toJsonString(contextMap));
             }
 
             Output.print(scriptResult);

@@ -25,7 +25,14 @@ build-deb:
 build-rpms:
 	scripts/build-rpms.sh
 run:
-	java -jar target/jexl-executor.jar
+	java -jar target/jexl-executor.jar \
+		--debug \
+		examples/context.json \
+		examples/script1.jexl \
+		examples/script2.jexl \
+		examples/script2a.json \
+		examples/script3.jexl
+
 qlty-check:
 	qlty check --all
 
