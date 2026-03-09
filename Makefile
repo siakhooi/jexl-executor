@@ -26,7 +26,6 @@ build-rpms:
 	scripts/build-rpms.sh
 run:
 	java -jar target/jexl-executor.jar \
-		--debug \
 		examples/context.json \
 		examples/script1.jexl \
 		examples/script2.jexl \

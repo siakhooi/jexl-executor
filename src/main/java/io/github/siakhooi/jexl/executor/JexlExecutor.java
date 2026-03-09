@@ -44,6 +44,9 @@ public class JexlExecutor implements Callable<Integer> {
     @Option(names = { "--debug" }, description = "Enable debug mode")
     private boolean debug;
 
+    @Option(names = { "--full", "-F" }, description = "Print full context instead of result")
+    private boolean fullContext;
+
     @Override
     public Integer call() throws Exception {
         LogLevelUtil.setRootLogLevelDebug(debug);
@@ -79,7 +82,7 @@ public class JexlExecutor implements Callable<Integer> {
                 logger.debug("result context: {}", JsonUtils.toJsonString(contextMap));
             }
 
-            Output.print(scriptResult);
+            Output.print(fullContext, contextMap, scriptResult);
 
             return 0;
         } catch (Exception e) {

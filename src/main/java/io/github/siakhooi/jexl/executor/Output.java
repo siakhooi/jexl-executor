@@ -7,9 +7,14 @@ public class Output {
     private Output() {
     }
 
-    public static void print(Object scriptResult) throws JsonProcessingException {
+    public static void print(boolean fullContext, Object contextMap, Object scriptResult) throws JsonProcessingException {
         ObjectMapper prettyMapper = new ObjectMapper();
-        String resultJson = prettyMapper.writerWithDefaultPrettyPrinter().writeValueAsString(scriptResult);
+        String resultJson;
+        if (fullContext) {
+            resultJson = prettyMapper.writerWithDefaultPrettyPrinter().writeValueAsString(contextMap);
+        } else {
+            resultJson = prettyMapper.writerWithDefaultPrettyPrinter().writeValueAsString(scriptResult);
+        }
         Console.printf("%s%n", resultJson);
     }
 }
