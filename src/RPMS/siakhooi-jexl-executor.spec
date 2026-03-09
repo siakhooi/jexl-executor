@@ -1,5 +1,5 @@
 Name:           siakhooi-jexl-executor
-Version:        1.1.0
+Version:        1.2.0
 Release:        1%{?dist}
 Summary:        jexl scripts executor
 
@@ -29,5 +29,15 @@ install %{_working_directory}/LICENSE %{_builddir}
 %{_libdir}/java/siakhooi/jexl-executor.jar
 
 %changelog
+* Mon Mar 9 2026 Siak Hooi <siakhooi@gmail.com> - 1.2.0
+- support json
+- new option: --full, -F to print full context instead of result
+- debug log with json format
+
+* Tue Feb 24 2026 Siak Hooi <siakhooi@gmail.com> - 1.1.0
+- new option: --debug
+- code refactors
+- bug fixes
+
 * Sat Jan 24 2026 Siak Hooi <siakhooi@gmail.com> - 1.0.0
 - initial release
