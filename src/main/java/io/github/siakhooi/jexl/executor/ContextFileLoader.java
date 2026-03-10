@@ -1,6 +1,6 @@
 package io.github.siakhooi.jexl.executor;
 
-import static io.github.siakhooi.jexl.executor.FileUtils.readFile;
+import static io.github.siakhooi.jexl.executor.InputFile.readFile;
 
 import java.io.File;
 import java.io.IOException;

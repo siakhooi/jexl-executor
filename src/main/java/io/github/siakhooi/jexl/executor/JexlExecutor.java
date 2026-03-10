@@ -1,11 +1,13 @@
 package io.github.siakhooi.jexl.executor;
 
-import static io.github.siakhooi.jexl.executor.FileUtils.readFile;
+import static io.github.siakhooi.jexl.executor.InputFile.readFile;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
@@ -13,6 +15,7 @@ import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import io.github.siakhooi.jexl.executor.config.ExecutionStep;
 import io.github.siakhooi.jexl.executor.config.ExecutionType;
 import io.github.siakhooi.jexl.executor.config.FlowPath;
@@ -66,12 +69,12 @@ public class JexlExecutor implements Callable<Integer> {
 
                     scriptResult = executeJexl(contextMap, jexlScript, classLoader);
                     if (logger.isDebugEnabled()) {
-                        logger.debug("scriptResult: {}", JsonUtils.toJsonString(scriptResult));
+                        logger.debug("scriptResult: {}", JsonConverter.toJsonString(scriptResult));
                     }
                 } else if (step.executionType() == ExecutionType.JSON) {
-                    scriptResult = JsonUtils.parseJson(jexlScript);
+                    scriptResult = JsonConverter.parseJson(jexlScript);
                     if (logger.isDebugEnabled()) {
-                        logger.debug("scriptResult: {}", JsonUtils.toJsonString(scriptResult));
+                        logger.debug("scriptResult: {}", JsonConverter.toJsonString(scriptResult));
                     }
                 } else {
                     logger.warn("Unknown execution type for step '{}', skipping execution", step.name());
@@ -81,7 +84,7 @@ public class JexlExecutor implements Callable<Integer> {
                 String[] pathParts = ResultPath.get(step.name(), resultPathTemplate);
                 contextMap = ContextMapMerger.merge(contextMap, scriptResult, pathParts);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("result context: {}", JsonUtils.toJsonString(contextMap));
+                    logger.debug("result context: {}", JsonConverter.toJsonString(contextMap));
                 }
             }
 
