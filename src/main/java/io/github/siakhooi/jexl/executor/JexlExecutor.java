@@ -1,7 +1,5 @@
 package io.github.siakhooi.jexl.executor;
 
-import static io.github.siakhooi.jexl.executor.InputFile.readFile;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.siakhooi.jexl.executor.config.ExecutionStep;
-import io.github.siakhooi.jexl.executor.config.ExecutionType;
 import io.github.siakhooi.jexl.executor.config.FlowPath;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -21,8 +18,6 @@ import picocli.CommandLine.Parameters;
 @Command(name = "jexl-executor", mixinStandardHelpOptions = true, version = Version.APPLICATION_VERSION, description = "Execute JEXL scripts with JSON context in a chain")
 public class JexlExecutor implements Callable<Integer> {
     private static final Logger logger = LoggerFactory.getLogger(JexlExecutor.class);
-
-    private final JexlScriptExecutor jexlScriptExecutor = new JexlScriptExecutor();
 
     @Option(names = { "--result-path",
             "-r" }, defaultValue = "{name}", description = "Path template for results. Use {name} as placeholder for script basename (default: ${DEFAULT-VALUE}). Examples: {name}, output.{name}, results.{name}.data")
@@ -49,44 +44,18 @@ public class JexlExecutor implements Callable<Integer> {
         LogLevelUtil.setRootLogLevelDebug(debug);
         try {
             ClassLoader classLoader = ApplicationClassLoader.get(jarListFile);
-
             Map<String, Object> contextMap = ContextFileLoader.get(contextFile);
-
             Object scriptResult = new HashMap<String, Object>();
 
             FlowPath flowPath = FilesToFlowPath.generate(scriptFiles);
+            StepExecutor stepExecutor = new StepExecutor(resultPathTemplate, debug, classLoader);
 
             for (ExecutionStep step : flowPath.getSteps()) {
-                logger.debug("Executing step: {}", step.name());
-                String jexlScript = readFile(step.scriptFile());
-
-                logger.debug("jexlScript: {}", jexlScript);
-
-                if (step.executionType() == ExecutionType.JEXL) {
-
-                    scriptResult = jexlScriptExecutor.execute(contextMap, jexlScript, classLoader);
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("scriptResult: {}", JsonConverter.toJsonString(scriptResult));
-                    }
-                } else if (step.executionType() == ExecutionType.JSON) {
-                    scriptResult = JsonConverter.parseJson(jexlScript);
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("scriptResult: {}", JsonConverter.toJsonString(scriptResult));
-                    }
-                } else {
-                    logger.warn("Unknown execution type for step '{}', skipping execution", step.name());
-                    continue;
-                }
-
-                String[] pathParts = ResultPath.get(step.name(), resultPathTemplate);
-                contextMap = ContextMapMerger.merge(contextMap, scriptResult, pathParts);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("result context: {}", JsonConverter.toJsonString(contextMap));
-                }
+                StepExecutor.StepResult stepResult = stepExecutor.executeStep(step, contextMap);
+                contextMap = stepResult.contextMap;
+                scriptResult = stepResult.scriptResult;
             }
-
             Output.print(fullContext, contextMap, scriptResult);
-
             return 0;
         } catch (Exception e) {
             logger.error("Error: {}", e.getMessage(), e);
