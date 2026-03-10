@@ -11,12 +11,10 @@ public class StepExecutor {
     private static final Logger logger = LoggerFactory.getLogger(StepExecutor.class);
     private final JexlScriptExecutor jexlScriptExecutor = new JexlScriptExecutor();
     private final String resultPathTemplate;
-    private final boolean debug;
     private final ClassLoader classLoader;
 
-    public StepExecutor(String resultPathTemplate, boolean debug, ClassLoader classLoader) {
+    public StepExecutor(String resultPathTemplate, ClassLoader classLoader) {
         this.resultPathTemplate = resultPathTemplate;
-        this.debug = debug;
         this.classLoader = classLoader;
     }
 
@@ -37,25 +35,19 @@ public class StepExecutor {
         }
         String[] pathParts = ResultPath.get(step.name(), resultPathTemplate);
         Map<String, Object> newContextMap = ContextMapMerger.merge(contextMap, scriptResult, pathParts);
-        if (debug) {
-            logger.debug("result context: {}", JsonConverter.toJsonString(newContextMap));
-        }
+        logger.debug("result context: {}", JsonConverter.toJsonString(newContextMap));
         return new StepResult(newContextMap, scriptResult);
     }
 
     private Object executeJexlStep(Map<String, Object> contextMap, String jexlScript) throws Exception {
         Object scriptResult = jexlScriptExecutor.execute(contextMap, jexlScript, classLoader);
-        if (debug) {
-            logger.debug("scriptResult: {}", JsonConverter.toJsonString(scriptResult));
-        }
+        logger.debug("scriptResult: {}", JsonConverter.toJsonString(scriptResult));
         return scriptResult;
     }
 
     private Object executeJsonStep(String jexlScript) throws Exception {
         Object scriptResult = JsonConverter.parseJson(jexlScript);
-        if (debug) {
-            logger.debug("scriptResult: {}", JsonConverter.toJsonString(scriptResult));
-        }
+        logger.debug("scriptResult: {}", JsonConverter.toJsonString(scriptResult));
         return scriptResult;
     }
 

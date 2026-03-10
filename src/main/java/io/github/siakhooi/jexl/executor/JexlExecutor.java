@@ -48,7 +48,7 @@ public class JexlExecutor implements Callable<Integer> {
             Object scriptResult = new HashMap<String, Object>();
 
             FlowPath flowPath = FilesToFlowPath.generate(scriptFiles);
-            StepExecutor stepExecutor = new StepExecutor(resultPathTemplate, debug, classLoader);
+            StepExecutor stepExecutor = new StepExecutor(resultPathTemplate, classLoader);
 
             for (ExecutionStep step : flowPath.getSteps()) {
                 StepExecutor.StepResult stepResult = stepExecutor.executeStep(step, contextMap);
