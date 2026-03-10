@@ -1,5 +1,6 @@
 package io.github.siakhooi.jexl.executor;
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -18,7 +19,7 @@ public class StepExecutor {
         this.classLoader = classLoader;
     }
 
-    public StepResult executeStep(ExecutionStep step, Map<String, Object> contextMap) throws Exception {
+    public StepResult executeStep(ExecutionStep step, Map<String, Object> contextMap) throws IOException {
         logger.debug("Executing step: {}", step.name());
         String jexlScript = InputFile.readFile(step.scriptFile());
         logger.debug("jexlScript: {}", jexlScript);
@@ -39,13 +40,13 @@ public class StepExecutor {
         return new StepResult(newContextMap, scriptResult);
     }
 
-    private Object executeJexlStep(Map<String, Object> contextMap, String jexlScript) throws Exception {
+    private Object executeJexlStep(Map<String, Object> contextMap, String jexlScript) {
         Object scriptResult = jexlScriptExecutor.execute(contextMap, jexlScript, classLoader);
         logger.debug("scriptResult: {}", JsonConverter.toJsonString(scriptResult));
         return scriptResult;
     }
 
-    private Object executeJsonStep(String jexlScript) throws Exception {
+    private Object executeJsonStep(String jexlScript) throws IOException {
         Object scriptResult = JsonConverter.parseJson(jexlScript);
         logger.debug("scriptResult: {}", JsonConverter.toJsonString(scriptResult));
         return scriptResult;
