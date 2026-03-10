@@ -14,7 +14,7 @@ import java.util.zip.ZipEntry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-public class ApplicationClassLoaderTest {
+class ApplicationClassLoaderTest {
     @Test
     void testGetWithNullJarListFile() throws IOException {
         ClassLoader original = Thread.currentThread().getContextClassLoader();
