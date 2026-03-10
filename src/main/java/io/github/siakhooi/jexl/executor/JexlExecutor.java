@@ -30,7 +30,7 @@ public class JexlExecutor {
     }
 
     public int execute() {
-        LogLevelUtil.setRootLogLevelDebug(debug);
+        LogLevelControl.setRootLogLevelDebug(debug);
         try {
             ClassLoader classLoader = ApplicationClassLoader.get(jarListFile);
             Map<String, Object> initialContextMap = ContextFileLoader.get(contextFile);
