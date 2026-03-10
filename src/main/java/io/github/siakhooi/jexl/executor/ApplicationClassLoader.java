@@ -7,7 +7,7 @@ public class ApplicationClassLoader {
     private ApplicationClassLoader() {
     }
 
-    public static ClassLoader get(File jarListFile) throws IOException {
+    static ClassLoader get(File jarListFile) throws IOException {
         if (jarListFile != null) {
             ClassLoader classLoader = CustomClassLoader.loadJars(jarListFile);
             Thread.currentThread().setContextClassLoader(classLoader);
