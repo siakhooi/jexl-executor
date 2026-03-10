@@ -29,10 +29,12 @@ $ sudo yum install siakhooi-jexl-executor
 
 ```
 $ jexl-executor -h
-Usage: jexl-executor [-hV] [-j=<jarListFile>] [-r=<resultPathTemplate>] <contextFile> <scriptFiles>...
+Usage: jexl-executor [-FhV] [--debug] [-j=<jarListFile>] [-r=<resultPathTemplate>] <contextFile> <scriptFiles>...
 Execute JEXL scripts with JSON context in a chain
       <contextFile>      Initial context JSON file
-      <scriptFiles>...   JEXL script files to execute in sequence
+      <scriptFiles>...   JEXL script or JSON files to execute in sequence
+      --debug            Enable debug mode
+  -F, --full             Print full context instead of result
   -h, --help             Show this help message and exit.
   -j, --jarfile=<jarListFile>
                          File containing JAR paths (one per line) to load for JEXL scripts
@@ -42,6 +44,16 @@ Execute JEXL scripts with JSON context in a chain
   -V, --version          Print version information and exit.
 ```
 
+### Examples
+
+```
+$ jexl-executor initial-context.json step1.jexl step2.json step3.jexl
+
+$ jexl-executor -F initial-context.json step1.jexl step2.json step3.jexl
+
+$ jexl-executor -r 'output.{name}' initial-context.json step1.jexl step2.json step3.jexl
+
+```
 ## URL
 
 ### Quality
@@ -95,6 +107,4 @@ Execute JEXL scripts with JSON context in a chain
 ![Sonar Violations (short format)](https://img.shields.io/sonar/info_violations/siakhooi_jexl-executor?server=https%3A%2F%2Fsonarcloud.io)
 ![Sonar Violations (long format)](https://img.shields.io/sonar/violations/siakhooi_jexl-executor?format=long&server=http%3A%2F%2Fsonarcloud.io)
 
-[![Generic badge](https://img.shields.io/badge/Funding-BuyMeACoffee-33cb56.svg)](https://www.buymeacoffee.com/siakhooi)
-[![Generic badge](https://img.shields.io/badge/Funding-Ko%20Fi-33cb56.svg)](https://ko-fi.com/siakhooi)
-![visitors](https://hit-tztugwlsja-uc.a.run.app/?outputtype=badge&counter=ghmd-jexl-executor)
+[![Wise](https://img.shields.io/badge/Funding-Wise-33cb56.svg?logo=wise)](https://wise.com/pay/me/siakn3)![visitors](https://hit-tztugwlsja-uc.a.run.app/?outputtype=badge&counter=ghmd-jexl-executor)
