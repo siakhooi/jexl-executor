@@ -1,7 +1,6 @@
 package io.github.siakhooi.jexl.executor;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -9,7 +8,6 @@ import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.siakhooi.jexl.executor.config.ExecutionStep;
 import io.github.siakhooi.jexl.executor.config.FlowPath;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -44,18 +42,14 @@ public class JexlExecutor implements Callable<Integer> {
         LogLevelUtil.setRootLogLevelDebug(debug);
         try {
             ClassLoader classLoader = ApplicationClassLoader.get(jarListFile);
-            Map<String, Object> contextMap = ContextFileLoader.get(contextFile);
-            Object scriptResult = new HashMap<String, Object>();
+            Map<String, Object> initialContextMap = ContextFileLoader.get(contextFile);
 
             FlowPath flowPath = FilesToFlowPath.generate(scriptFiles);
             StepExecutor stepExecutor = new StepExecutor(resultPathTemplate, classLoader);
 
-            for (ExecutionStep step : flowPath.getSteps()) {
-                StepExecutor.StepResult stepResult = stepExecutor.executeStep(step, contextMap);
-                contextMap = stepResult.contextMap;
-                scriptResult = stepResult.scriptResult;
-            }
-            Output.print(fullContext, contextMap, scriptResult);
+            FlowExecutor flowExecutor = new FlowExecutor();
+            FlowExecutor.Result flowResult = flowExecutor.execute(flowPath, stepExecutor, initialContextMap);
+            Output.print(fullContext, flowResult.contextMap, flowResult.scriptResult);
             return 0;
         } catch (Exception e) {
             logger.error("Error: {}", e.getMessage(), e);
