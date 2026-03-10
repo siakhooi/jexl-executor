@@ -5,7 +5,7 @@ public class Console {
     }
 
     @SuppressWarnings("java:S106")
-    public static void printf(String format, Object... args) {
+    static void printf(String format, Object... args) {
         System.out.printf(format, args);
     }
 
