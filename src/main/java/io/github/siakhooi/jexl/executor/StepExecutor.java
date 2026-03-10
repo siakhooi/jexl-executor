@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.github.siakhooi.jexl.executor.config.ExecutionStep;
-import io.github.siakhooi.jexl.executor.config.ExecutionType;
 
 public class StepExecutor {
     private static final Logger logger = LoggerFactory.getLogger(StepExecutor.class);
@@ -26,19 +25,15 @@ public class StepExecutor {
         String jexlScript = InputFile.readFile(step.scriptFile());
         logger.debug("jexlScript: {}", jexlScript);
         Object scriptResult;
-        if (step.executionType() == ExecutionType.JEXL) {
-            scriptResult = jexlScriptExecutor.execute(contextMap, jexlScript, classLoader);
-            if (debug) {
-                logger.debug("scriptResult: {}", JsonConverter.toJsonString(scriptResult));
-            }
-        } else if (step.executionType() == ExecutionType.JSON) {
-            scriptResult = JsonConverter.parseJson(jexlScript);
-            if (debug) {
-                logger.debug("scriptResult: {}", JsonConverter.toJsonString(scriptResult));
-            }
-        } else {
-            logger.warn("Unknown execution type for step '{}', skipping execution", step.name());
-            return new StepResult(contextMap, null);
+        switch (step.executionType()) {
+            case JEXL:
+                scriptResult = executeJexlStep(contextMap, jexlScript);
+                break;
+            case JSON:
+                scriptResult = executeJsonStep(jexlScript);
+                break;
+            default:
+                return handleUnknownStep(step, contextMap);
         }
         String[] pathParts = ResultPath.get(step.name(), resultPathTemplate);
         Map<String, Object> newContextMap = ContextMapMerger.merge(contextMap, scriptResult, pathParts);
@@ -46,6 +41,27 @@ public class StepExecutor {
             logger.debug("result context: {}", JsonConverter.toJsonString(newContextMap));
         }
         return new StepResult(newContextMap, scriptResult);
+    }
+
+    private Object executeJexlStep(Map<String, Object> contextMap, String jexlScript) throws Exception {
+        Object scriptResult = jexlScriptExecutor.execute(contextMap, jexlScript, classLoader);
+        if (debug) {
+            logger.debug("scriptResult: {}", JsonConverter.toJsonString(scriptResult));
+        }
+        return scriptResult;
+    }
+
+    private Object executeJsonStep(String jexlScript) throws Exception {
+        Object scriptResult = JsonConverter.parseJson(jexlScript);
+        if (debug) {
+            logger.debug("scriptResult: {}", JsonConverter.toJsonString(scriptResult));
+        }
+        return scriptResult;
+    }
+
+    private StepResult handleUnknownStep(ExecutionStep step, Map<String, Object> contextMap) {
+        logger.warn("Unknown execution type for step '{}', skipping execution", step.name());
+        return new StepResult(contextMap, null);
     }
 
     public static class StepResult {

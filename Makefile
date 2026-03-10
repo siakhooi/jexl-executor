@@ -19,7 +19,7 @@ release:
 	scripts/create-release.sh
 
 build:
-	mvn verify
+	mvn clean verify
 build-deb:
 	scripts/build-deb.sh
 build-rpms:
