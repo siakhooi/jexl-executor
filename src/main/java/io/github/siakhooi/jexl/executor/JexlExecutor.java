@@ -19,12 +19,8 @@ import picocli.CommandLine.Parameters;
 public class JexlExecutor implements Callable<Integer> {
     private static final Logger logger = LoggerFactory.getLogger(JexlExecutor.class);
 
-    @Option(names = { "--result-path",
-            "-r" }, defaultValue = "{name}", description = "Path template for results. Use {name} as placeholder for script basename (default: ${DEFAULT-VALUE}). Examples: {name}, output.{name}, results.{name}.data")
-    private String resultPathTemplate;
-
-    @Option(names = { "--jarfile",
-            "-j" }, description = "File containing JAR paths (one per line) to load for JEXL scripts")
+        // Input files group
+    @Option(names = { "--jarfile", "-j" }, description = "File containing JAR paths (one per line) to load for JEXL scripts")
     private File jarListFile;
 
     @Parameters(index = "0", description = "Initial context JSON file")
@@ -32,6 +28,10 @@ public class JexlExecutor implements Callable<Integer> {
 
     @Parameters(index = "1..*", arity = "1..*", description = "JEXL script or JSON files to execute in sequence")
     private List<File> scriptFiles;
+
+    // Execution options group
+    @Option(names = { "--result-path", "-r" }, defaultValue = "{name}", description = "Path template for results. Use {name} as placeholder for script basename (default: ${DEFAULT-VALUE}). Examples: {name}, output.{name}, results.{name}.data")
+    private String resultPathTemplate;
 
     @Option(names = { "--debug" }, description = "Enable debug mode")
     private boolean debug;
