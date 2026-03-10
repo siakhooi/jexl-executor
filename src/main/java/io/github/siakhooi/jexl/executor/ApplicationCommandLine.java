@@ -2,20 +2,14 @@ package io.github.siakhooi.jexl.executor;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.github.siakhooi.jexl.executor.config.FlowPath;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 @Command(name = "jexl-executor", mixinStandardHelpOptions = true, version = Version.APPLICATION_VERSION, description = "Execute JEXL scripts with JSON context in a chain")
 public class ApplicationCommandLine implements Callable<Integer> {
-    private static final Logger logger = LoggerFactory.getLogger(ApplicationCommandLine.class);
 
         // Input files group
     @Option(names = { "--jarfile", "-j" }, description = "File containing JAR paths (one per line) to load for JEXL scripts")
@@ -39,22 +33,9 @@ public class ApplicationCommandLine implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        LogLevelUtil.setRootLogLevelDebug(debug);
-        try {
-            ClassLoader classLoader = ApplicationClassLoader.get(jarListFile);
-            Map<String, Object> initialContextMap = ContextFileLoader.get(contextFile);
+        return (new JexlExecutor(jarListFile, contextFile, scriptFiles, resultPathTemplate, debug, fullContext))
+                .execute();
 
-            FlowPath flowPath = FilesToFlowPath.generate(scriptFiles);
-            StepExecutor stepExecutor = new StepExecutor(resultPathTemplate, classLoader);
-
-            FlowExecutor flowExecutor = new FlowExecutor();
-            FlowExecutor.Result flowResult = flowExecutor.execute(flowPath, stepExecutor, initialContextMap);
-            Output.print(fullContext, flowResult.contextMap, flowResult.scriptResult);
-            return 0;
-        } catch (Exception e) {
-            logger.error("Error: {}", e.getMessage(), e);
-            return 1;
-        }
     }
 
 }
