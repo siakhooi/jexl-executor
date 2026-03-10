@@ -7,7 +7,7 @@ public class Output {
     private Output() {
     }
 
-    public static void print(boolean fullContext, Object contextMap, Object scriptResult) throws JsonProcessingException {
+    static void print(boolean fullContext, Object contextMap, Object scriptResult) throws JsonProcessingException {
         ObjectMapper prettyMapper = new ObjectMapper();
         String resultJson;
         if (fullContext) {
