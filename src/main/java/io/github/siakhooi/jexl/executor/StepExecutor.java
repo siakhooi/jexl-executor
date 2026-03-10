@@ -10,13 +10,12 @@ import io.github.siakhooi.jexl.executor.config.ExecutionStep;
 
 public class StepExecutor {
     private static final Logger logger = LoggerFactory.getLogger(StepExecutor.class);
-    private final JexlScriptExecutor jexlScriptExecutor = new JexlScriptExecutor();
+    private final JexlScriptExecutor jexlScriptExecutor;
     private final String resultPathTemplate;
-    private final ClassLoader classLoader;
 
     public StepExecutor(String resultPathTemplate, ClassLoader classLoader) {
         this.resultPathTemplate = resultPathTemplate;
-        this.classLoader = classLoader;
+        this.jexlScriptExecutor = new JexlScriptExecutor(classLoader);
     }
 
     public StepResult executeStep(ExecutionStep step, Map<String, Object> contextMap) throws IOException {
@@ -41,7 +40,7 @@ public class StepExecutor {
     }
 
     private Object executeJexlStep(Map<String, Object> contextMap, String jexlScript) {
-        Object scriptResult = jexlScriptExecutor.execute(contextMap, jexlScript, classLoader);
+        Object scriptResult = jexlScriptExecutor.execute(contextMap, jexlScript);
         logger.debug("scriptResult: {}", JsonConverter.toJsonString(scriptResult));
         return scriptResult;
     }
