@@ -8,11 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.apache.commons.jexl3.JexlBuilder;
-import org.apache.commons.jexl3.JexlContext;
-import org.apache.commons.jexl3.JexlEngine;
-import org.apache.commons.jexl3.MapContext;
-import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +21,8 @@ import picocli.CommandLine.Parameters;
 @Command(name = "jexl-executor", mixinStandardHelpOptions = true, version = Version.APPLICATION_VERSION, description = "Execute JEXL scripts with JSON context in a chain")
 public class JexlExecutor implements Callable<Integer> {
     private static final Logger logger = LoggerFactory.getLogger(JexlExecutor.class);
+
+    private final JexlScriptExecutor jexlScriptExecutor = new JexlScriptExecutor();
 
     @Option(names = { "--result-path",
             "-r" }, defaultValue = "{name}", description = "Path template for results. Use {name} as placeholder for script basename (default: ${DEFAULT-VALUE}). Examples: {name}, output.{name}, results.{name}.data")
@@ -67,7 +64,7 @@ public class JexlExecutor implements Callable<Integer> {
 
                 if (step.executionType() == ExecutionType.JEXL) {
 
-                    scriptResult = executeJexl(contextMap, jexlScript, classLoader);
+                    scriptResult = jexlScriptExecutor.execute(contextMap, jexlScript, classLoader);
                     if (logger.isDebugEnabled()) {
                         logger.debug("scriptResult: {}", JsonConverter.toJsonString(scriptResult));
                     }
@@ -97,12 +94,4 @@ public class JexlExecutor implements Callable<Integer> {
         }
     }
 
-    private static Object executeJexl(Map<String, Object> contextMap, String jexlScript, ClassLoader classLoader) {
-        JexlPermissions permissions = JexlPermissions.UNRESTRICTED;
-        JexlEngine jexl = new JexlBuilder().loader(classLoader).permissions(permissions).create();
-        JexlContext context = new MapContext(contextMap);
-
-        var script = jexl.createScript(jexlScript);
-        return script.execute(context);
-    }
 }
