@@ -15,9 +15,4 @@ public class LogLevelControl {
         ch.qos.logback.classic.Logger rootLogger = loggerContext.getLogger("ROOT");
         rootLogger.setLevel(debug ? Level.DEBUG : Level.INFO);
     }
-    static boolean isDebugEnabled() {
-        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        ch.qos.logback.classic.Logger rootLogger = loggerContext.getLogger("ROOT");
-        return rootLogger.getLevel() == Level.DEBUG;
-    }
 }

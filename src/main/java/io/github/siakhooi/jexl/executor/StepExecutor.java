@@ -35,7 +35,7 @@ public class StepExecutor {
         }
         String[] pathParts = ResultPath.get(step.name(), resultPathTemplate);
         Map<String, Object> newContextMap = ContextMapMerger.merge(contextMap, scriptResult, pathParts);
-        if(LogLevelControl.isDebugEnabled()) {
+        if(logger.isDebugEnabled()) {
             logger.debug("Merged context: {}", JsonConverter.toJsonString(newContextMap));
         }
         return new StepResult(newContextMap, scriptResult);
@@ -43,7 +43,7 @@ public class StepExecutor {
 
     private Object executeJexlStep(Map<String, Object> contextMap, String jexlScript) {
         Object scriptResult = jexlScriptExecutor.execute(contextMap, jexlScript);
-        if(LogLevelControl.isDebugEnabled()) {
+        if(logger.isDebugEnabled()) {
             logger.debug("scriptResult: {}", JsonConverter.toJsonString(scriptResult));
         }
         return scriptResult;
@@ -51,7 +51,7 @@ public class StepExecutor {
 
     private Object executeJsonStep(String jexlScript) throws IOException {
         Object scriptResult = JsonConverter.parseJson(jexlScript);
-        if(LogLevelControl.isDebugEnabled()) {
+        if(logger.isDebugEnabled()) {
             logger.debug("scriptResult: {}", JsonConverter.toJsonString(scriptResult));
         }
         return scriptResult;
