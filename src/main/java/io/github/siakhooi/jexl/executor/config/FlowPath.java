@@ -2,7 +2,7 @@ package io.github.siakhooi.jexl.executor.config;
 
 import java.util.List;
 
-public class ExecutionPlan {
+public class FlowPath {
     private List<ExecutionStep> steps;
 
     public void setSteps(List<ExecutionStep> steps) {

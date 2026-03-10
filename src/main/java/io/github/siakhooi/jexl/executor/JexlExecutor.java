@@ -1,13 +1,11 @@
 package io.github.siakhooi.jexl.executor;
 
 import static io.github.siakhooi.jexl.executor.FileUtils.readFile;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
@@ -15,10 +13,9 @@ import org.apache.commons.jexl3.MapContext;
 import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.github.siakhooi.jexl.executor.config.ExecutionPlan;
 import io.github.siakhooi.jexl.executor.config.ExecutionStep;
 import io.github.siakhooi.jexl.executor.config.ExecutionType;
+import io.github.siakhooi.jexl.executor.config.FlowPath;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -57,9 +54,9 @@ public class JexlExecutor implements Callable<Integer> {
 
             Object scriptResult = new HashMap<String, Object>();
 
-            ExecutionPlan executionPlan = ExecutionPlanUtil.loadExecutionPlan(scriptFiles);
+            FlowPath flowPath = FilesToFlowPath.generate(scriptFiles);
 
-            for (ExecutionStep step : executionPlan.getSteps()) {
+            for (ExecutionStep step : flowPath.getSteps()) {
                 logger.debug("Executing step: {}", step.name());
                 String jexlScript = readFile(step.scriptFile());
 
