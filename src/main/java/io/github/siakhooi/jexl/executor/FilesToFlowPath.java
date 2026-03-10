@@ -3,6 +3,7 @@ package io.github.siakhooi.jexl.executor;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
+
 import io.github.siakhooi.jexl.executor.config.ExecutionStep;
 import io.github.siakhooi.jexl.executor.config.ExecutionType;
 import io.github.siakhooi.jexl.executor.config.FlowPath;
@@ -28,7 +29,7 @@ public class FilesToFlowPath {
         return ExecutionType.UNKNOWN;
     }
 
-    public static FlowPath generate(List<File> scriptFiles) {
+    static FlowPath generate(List<File> scriptFiles) {
         FlowPath flowPath = new FlowPath();
 
         List<ExecutionStep> steps = scriptFiles.stream()
