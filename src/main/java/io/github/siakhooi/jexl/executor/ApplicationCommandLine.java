@@ -14,8 +14,8 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 @Command(name = "jexl-executor", mixinStandardHelpOptions = true, version = Version.APPLICATION_VERSION, description = "Execute JEXL scripts with JSON context in a chain")
-public class JexlExecutor implements Callable<Integer> {
-    private static final Logger logger = LoggerFactory.getLogger(JexlExecutor.class);
+public class ApplicationCommandLine implements Callable<Integer> {
+    private static final Logger logger = LoggerFactory.getLogger(ApplicationCommandLine.class);
 
         // Input files group
     @Option(names = { "--jarfile", "-j" }, description = "File containing JAR paths (one per line) to load for JEXL scripts")
