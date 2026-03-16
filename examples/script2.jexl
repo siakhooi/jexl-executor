@@ -2,9 +2,15 @@ var subtotal = 0;
 for (var item : order.items) {
   subtotal = subtotal + (item.price * item.quantity);
 }
+
+stdout.printf("subtotal is %s%n", subtotal);
+
 var afterDiscount = subtotal * (1 - order.discount);
 var tax = afterDiscount * constants.taxRate;
 var total = afterDiscount + tax;
+
+stdout.printf("total is %s%n", total);
+
 {
   'subtotal': subtotal,
   'discount': subtotal * order.discount,

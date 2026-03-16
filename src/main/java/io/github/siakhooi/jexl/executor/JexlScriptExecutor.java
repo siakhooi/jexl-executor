@@ -1,5 +1,6 @@
 package io.github.siakhooi.jexl.executor;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.jexl3.JexlBuilder;
@@ -17,7 +18,9 @@ public class JexlScriptExecutor {
     }
 
     public Object execute(Map<String, Object> contextMap, String jexlScript) {
-        JexlContext context = new MapContext(contextMap);
+        JexlContext context = new MapContext(new HashMap<>(contextMap));
+        context.set("stdout", System.out);
+        context.set("stderr", System.err);
         var script = jexl.createScript(jexlScript);
         return script.execute(context);
     }
