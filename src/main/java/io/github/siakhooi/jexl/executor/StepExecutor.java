@@ -25,7 +25,7 @@ public class StepExecutor {
         Object scriptResult;
         switch (step.executionType()) {
             case JEXL:
-                scriptResult = executeJexlStep(contextMap, jexlScript);
+                scriptResult = executeJexlStep(contextMap, jexlScript, step.scriptFile().getName());
                 break;
             case JSON:
                 scriptResult = executeJsonStep(jexlScript);
@@ -41,8 +41,8 @@ public class StepExecutor {
         return new StepResult(newContextMap, scriptResult);
     }
 
-    private Object executeJexlStep(Map<String, Object> contextMap, String jexlScript) {
-        Object scriptResult = jexlScriptExecutor.execute(contextMap, jexlScript);
+    private Object executeJexlStep(Map<String, Object> contextMap, String jexlScript, String sourceLabel) {
+        Object scriptResult = jexlScriptExecutor.execute(contextMap, jexlScript, sourceLabel);
         if(logger.isDebugEnabled()) {
             logger.debug("scriptResult: {}", JsonConverter.toJsonString(scriptResult));
         }
