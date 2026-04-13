@@ -46,6 +46,24 @@ class ContextFileLoaderTest {
     }
 
     @Test
+    @DisplayName("Should treat blank file as empty map")
+    void testGetBlankFile(@TempDir Path tempDir) throws IOException {
+        File file = tempDir.resolve("blank.json").toFile();
+        Files.writeString(file.toPath(), "");
+        Map<String, Object> map = ContextFileLoader.get(file);
+        assertTrue(map.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Should treat whitespace-only file as empty map")
+    void testGetWhitespaceOnlyFile(@TempDir Path tempDir) throws IOException {
+        File file = tempDir.resolve("spaces.json").toFile();
+        Files.writeString(file.toPath(), "   \n\t  ");
+        Map<String, Object> map = ContextFileLoader.get(file);
+        assertTrue(map.isEmpty());
+    }
+
+    @Test
     @DisplayName("Should throw IOException for invalid JSON")
     void testGetInvalidJson(@TempDir Path tempDir) throws IOException {
         String json = "{invalid json}";
