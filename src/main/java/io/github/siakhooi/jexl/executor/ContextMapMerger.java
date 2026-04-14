@@ -3,11 +3,19 @@ package io.github.siakhooi.jexl.executor;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ContextMapMerger {
+    private static final Logger logger = LoggerFactory.getLogger(ContextMapMerger.class);
+
     private ContextMapMerger() {
     }
 
     static Map<String, Object> merge(Map<String, Object> contextMap, Object result, String[] pathParts) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Merging step result into context path '{}'", String.join(".", pathParts));
+        }
         Map<String, Object> currentMap = contextMap;
         for (int i = 0; i < pathParts.length - 1; i++) {
             String part = pathParts[i];

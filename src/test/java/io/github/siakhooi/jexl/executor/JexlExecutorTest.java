@@ -9,6 +9,8 @@ import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import ch.qos.logback.classic.Level;
+
 class JexlExecutorTest {
 
     @Test
@@ -18,7 +20,7 @@ class JexlExecutorTest {
         File contextFile = new File(tempDir, "context.json");
         File scriptFile = new File(tempDir, "script.jexl");
         String resultPathTemplate = "{name}";
-        boolean debug = false;
+        Level rootLogLevel = Level.INFO;
         boolean fullContext = false;
 
         // Create dummy files and write valid JSON to contextFile
@@ -36,7 +38,7 @@ class JexlExecutorTest {
                 contextFile,
                 Collections.singletonList(scriptFile),
                 resultPathTemplate,
-                debug,
+                rootLogLevel,
                 fullContext);
 
         // Act
@@ -53,7 +55,7 @@ class JexlExecutorTest {
         File contextFile = new File("/invalid/path/context.json");
         File scriptFile = new File("/invalid/path/script.jexl");
         String resultPathTemplate = "{name}";
-        boolean debug = false;
+        Level rootLogLevel = Level.INFO;
         boolean fullContext = false;
 
         JexlExecutor executor = new JexlExecutor(
@@ -61,7 +63,7 @@ class JexlExecutorTest {
                 contextFile,
                 Collections.singletonList(scriptFile),
                 resultPathTemplate,
-                debug,
+                rootLogLevel,
                 fullContext);
 
         // Act

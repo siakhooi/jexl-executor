@@ -3,12 +3,18 @@ package io.github.siakhooi.jexl.executor;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.github.siakhooi.jexl.executor.config.ExecutionStep;
 import io.github.siakhooi.jexl.executor.config.ExecutionType;
 import io.github.siakhooi.jexl.executor.config.FlowPath;
 
 public class FilesToFlowPath {
+    private static final Logger logger = LoggerFactory.getLogger(FilesToFlowPath.class);
+
     private FilesToFlowPath() {}
 
     private static String getBaseName(String scriptFilePath) {
@@ -37,6 +43,8 @@ public class FilesToFlowPath {
                         getExecutionType(file.getAbsolutePath())))
                 .toList();
         flowPath.setSteps(steps);
+        logger.debug("Resolved flow: {}",
+                steps.stream().map(s -> s.name() + "(" + s.executionType() + ")").collect(Collectors.joining(" -> ")));
         return flowPath;
     }
 

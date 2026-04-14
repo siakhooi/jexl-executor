@@ -28,13 +28,14 @@ public class CustomClassLoader {
         for (String jarPath : jarPaths) {
             File jarFile = new File(jarPath);
             if (!jarFile.exists()) {
-                logger.error("Error: JAR file not found: {}", jarPath);
+                logger.error("JAR file not found: {}", jarPath);
                 continue;
             }
             urls.add(jarFile.toURI().toURL());
-            logger.debug("Loaded JAR: {}", jarPath);
+            logger.debug("Added JAR to classpath: {}", jarPath);
         }
 
+        logger.debug("Classloader will use {} JAR URL(s) from list", urls.size());
         return new URLClassLoader(urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
     }
 

@@ -4,12 +4,19 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import ch.qos.logback.classic.Level;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
+import picocli.CommandLine.ParameterException;
+import picocli.CommandLine.Spec;
 
 @Command(name = "jexl-executor", mixinStandardHelpOptions = true, version = Version.APPLICATION_VERSION, description = "Execute JEXL scripts with JSON context in a chain")
 public class ApplicationCommandLine implements Callable<Integer> {
+
+    @Spec
+    CommandSpec spec;
 
         // Input files group
     @Option(names = { "--jarfile", "-j" }, description = "File containing JAR paths (one per line) to load for JEXL scripts")
@@ -25,7 +32,10 @@ public class ApplicationCommandLine implements Callable<Integer> {
     @Option(names = { "--result-path", "-r" }, defaultValue = "{name}", description = "Path template for results. Use {name} as placeholder for script basename (default: ${DEFAULT-VALUE}). Examples: {name}, output.{name}, results.{name}.data")
     private String resultPathTemplate;
 
-    @Option(names = { "--debug" }, description = "Enable debug mode")
+    @Option(names = { "--log-level" }, paramLabel = "<level>", defaultValue = "info", description = "Root log level: trace, debug, info, warn, error, off, all (=trace) (default: ${DEFAULT-VALUE})")
+    private String logLevel;
+
+    @Option(names = { "--debug" }, description = "Shorthand for --log-level debug")
     private boolean debug;
 
     @Option(names = { "--full", "-F" }, description = "Print full context instead of result")
@@ -33,7 +43,13 @@ public class ApplicationCommandLine implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        return (new JexlExecutor(jarListFile, contextFile, scriptFiles, resultPathTemplate, debug, fullContext))
+        Level rootLevel;
+        try {
+            rootLevel = debug ? Level.DEBUG : LogLevelControl.parseLogLevel(logLevel);
+        } catch (IllegalArgumentException e) {
+            throw new ParameterException(spec.commandLine(), e.getMessage());
+        }
+        return (new JexlExecutor(jarListFile, contextFile, scriptFiles, resultPathTemplate, rootLevel, fullContext))
                 .execute();
 
     }
