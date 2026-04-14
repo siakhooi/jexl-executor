@@ -13,9 +13,9 @@ public class StepExecutor {
     private final JexlScriptExecutor jexlScriptExecutor;
     private final String resultPathTemplate;
 
-    public StepExecutor(String resultPathTemplate, ClassLoader classLoader) {
+    public StepExecutor(String resultPathTemplate, ClassLoader classLoader, boolean jexlDebug) {
         this.resultPathTemplate = resultPathTemplate;
-        this.jexlScriptExecutor = new JexlScriptExecutor(classLoader);
+        this.jexlScriptExecutor = new JexlScriptExecutor(classLoader, jexlDebug);
     }
 
     public StepResult executeStep(ExecutionStep step, Map<String, Object> contextMap) throws IOException {

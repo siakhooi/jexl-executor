@@ -24,8 +24,24 @@ build-deb:
 	scripts/build-deb.sh
 build-rpms:
 	scripts/build-rpms.sh
+run-help:
+	java -jar target/jexl-executor.jar --help
 run:
 	java -jar target/jexl-executor.jar \
+		examples/context.json \
+		examples/script1.jexl \
+		examples/script2.jexl \
+		examples/script2a.json \
+		examples/script3.jexl
+run-jexl-debug:
+	java -jar target/jexl-executor.jar --jexl-debug \
+		examples/context.json \
+		examples/script1.jexl \
+		examples/script2.jexl \
+		examples/script2a.json \
+		examples/script3.jexl
+run-debug:
+	java -jar target/jexl-executor.jar --debug \
 		examples/context.json \
 		examples/script1.jexl \
 		examples/script2.jexl \

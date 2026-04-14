@@ -18,8 +18,24 @@ public class JexlScriptExecutor {
     private final JexlEngine jexl;
 
     public JexlScriptExecutor(ClassLoader classLoader) {
+        this(classLoader, false);
+    }
+
+    /**
+     * @param jexlDebug when true, enables {@link org.apache.commons.jexl3.JexlBuilder#debug(boolean)} so JEXL failures include more diagnostic detail
+     */
+    public JexlScriptExecutor(ClassLoader classLoader, boolean jexlDebug) {
         JexlPermissions permissions = JexlPermissions.UNRESTRICTED;
-        jexl = new JexlBuilder().loader(classLoader).permissions(permissions).create();
+        jexl = new JexlBuilder()
+                .loader(classLoader)
+                .permissions(permissions)
+                .debug(jexlDebug)
+                .strict(true)
+                .silent(false)
+                .create();
+        if (jexlDebug) {
+            logger.debug("JEXL engine created with debug=true (richer errors on script failure)");
+        }
     }
 
     public Object execute(Map<String, Object> contextMap, String jexlScript, String sourceLabel) {

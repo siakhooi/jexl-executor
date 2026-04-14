@@ -20,7 +20,7 @@ class StepExecutorTest {
     @Test
     void executeStep_jexlType_mergesContext() throws IOException {
         // Arrange
-        StepExecutor executor = new StepExecutor("{name}", getClass().getClassLoader());
+        StepExecutor executor = new StepExecutor("{name}", getClass().getClassLoader(), false);
         Map<String, Object> context = new HashMap<>();
         context.put("foo", "bar");
 
@@ -39,7 +39,7 @@ class StepExecutorTest {
 
     @Test
     void executeStep_jsonType_mergesContext() throws IOException {
-        StepExecutor executor = new StepExecutor("{name}", getClass().getClassLoader());
+        StepExecutor executor = new StepExecutor("{name}", getClass().getClassLoader(), false);
         Map<String, Object> context = new HashMap<>();
         context.put("foo", "bar");
 
@@ -55,7 +55,7 @@ class StepExecutorTest {
 
     @Test
     void executeStep_unknownType_returnsOriginalContext() throws IOException {
-        StepExecutor executor = new StepExecutor("{name}", getClass().getClassLoader());
+        StepExecutor executor = new StepExecutor("{name}", getClass().getClassLoader(), false);
         Map<String, Object> context = new HashMap<>();
         context.put("foo", "bar");
 

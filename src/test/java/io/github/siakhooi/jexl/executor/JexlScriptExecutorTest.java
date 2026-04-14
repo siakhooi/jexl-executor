@@ -40,6 +40,15 @@ class JexlScriptExecutorTest {
     }
 
     @Test
+    void testExecuteWithJexlDebugEnabled() {
+        ClassLoader cl = JexlScriptExecutorTest.class.getClassLoader();
+        JexlScriptExecutor executor = new JexlScriptExecutor(cl, true);
+        Map<String, Object> context = Map.of("x", 1);
+        String script = "x + 1";
+        assertEquals(2, executor.execute(context, script, "dbg.jexl"));
+    }
+
+    @Test
     void testExecuteJexlErrorMessageIncludesSourceLabel() {
         ClassLoader cl = JexlScriptExecutorTest.class.getClassLoader();
         JexlScriptExecutor executor = new JexlScriptExecutor(cl);

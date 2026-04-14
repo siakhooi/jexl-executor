@@ -20,15 +20,17 @@ public class JexlExecutor {
     private final String resultPathTemplate;
     private final Level rootLogLevel;
     private final boolean fullContext;
+    private final boolean jexlDebug;
 
     public JexlExecutor(File jarListFile, File contextFile, List<File> scriptFiles, String resultPathTemplate,
-            Level rootLogLevel, boolean fullContext) {
+            Level rootLogLevel, boolean fullContext, boolean jexlDebug) {
         this.jarListFile = jarListFile;
         this.contextFile = contextFile;
         this.scriptFiles = scriptFiles;
         this.resultPathTemplate = resultPathTemplate;
         this.rootLogLevel = rootLogLevel;
         this.fullContext = fullContext;
+        this.jexlDebug = jexlDebug;
     }
 
     public int execute() {
@@ -40,6 +42,9 @@ public class JexlExecutor {
             if (jarListFile != null) {
                 logger.debug("JAR list file: {}", jarListFile.getAbsolutePath());
             }
+            if (jexlDebug) {
+                logger.debug("JEXL script engine debug enabled (--jexl-debug)");
+            }
 
             ClassLoader classLoader = ApplicationClassLoader.get(jarListFile);
             Map<String, Object> initialContextMap = ContextFileLoader.get(contextFile);
@@ -48,7 +53,7 @@ public class JexlExecutor {
             logger.debug("Script files in order: {}",
                     scriptFiles.stream().map(f -> f.getName()).collect(Collectors.joining(", ")));
 
-            StepExecutor stepExecutor = new StepExecutor(resultPathTemplate, classLoader);
+            StepExecutor stepExecutor = new StepExecutor(resultPathTemplate, classLoader, jexlDebug);
 
             FlowExecutor flowExecutor = new FlowExecutor();
             FlowExecutor.Result flowResult = flowExecutor.execute(flowPath, stepExecutor, initialContextMap);

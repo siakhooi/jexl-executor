@@ -22,6 +22,7 @@ class JexlExecutorTest {
         String resultPathTemplate = "{name}";
         Level rootLogLevel = Level.INFO;
         boolean fullContext = false;
+        boolean jexlDebug = false;
 
         // Create dummy files and write valid JSON to contextFile
         try {
@@ -39,7 +40,8 @@ class JexlExecutorTest {
                 Collections.singletonList(scriptFile),
                 resultPathTemplate,
                 rootLogLevel,
-                fullContext);
+                fullContext,
+                jexlDebug);
 
         // Act
         int result = executor.execute();
@@ -57,6 +59,7 @@ class JexlExecutorTest {
         String resultPathTemplate = "{name}";
         Level rootLogLevel = Level.INFO;
         boolean fullContext = false;
+        boolean jexlDebug = false;
 
         JexlExecutor executor = new JexlExecutor(
                 jarListFile,
@@ -64,7 +67,8 @@ class JexlExecutorTest {
                 Collections.singletonList(scriptFile),
                 resultPathTemplate,
                 rootLogLevel,
-                fullContext);
+                fullContext,
+                jexlDebug);
 
         // Act
         int result = executor.execute();

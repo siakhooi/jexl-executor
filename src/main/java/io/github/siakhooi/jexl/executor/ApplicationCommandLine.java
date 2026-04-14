@@ -41,6 +41,9 @@ public class ApplicationCommandLine implements Callable<Integer> {
     @Option(names = { "--full", "-F" }, description = "Print full context instead of result")
     private boolean fullContext;
 
+    @Option(names = { "--jexl-debug" }, description = "Enable Apache Commons JEXL engine debug mode for richer diagnostics when a script fails (independent of --log-level)")
+    private boolean jexlDebug;
+
     @Override
     public Integer call() throws Exception {
         Level rootLevel;
@@ -49,7 +52,8 @@ public class ApplicationCommandLine implements Callable<Integer> {
         } catch (IllegalArgumentException e) {
             throw new ParameterException(spec.commandLine(), e.getMessage());
         }
-        return (new JexlExecutor(jarListFile, contextFile, scriptFiles, resultPathTemplate, rootLevel, fullContext))
+        return (new JexlExecutor(jarListFile, contextFile, scriptFiles, resultPathTemplate, rootLevel, fullContext,
+                jexlDebug))
                 .execute();
 
     }
