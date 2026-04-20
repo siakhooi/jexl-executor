@@ -1,5 +1,5 @@
 Name:           siakhooi-jexl-executor
-Version:        1.4.0
+Version:        1.5.0
 Release:        1%{?dist}
 Summary:        jexl scripts executor
 
@@ -29,6 +29,15 @@ install %{_working_directory}/LICENSE %{_builddir}
 %{_libdir}/java/siakhooi/jexl-executor.jar
 
 %changelog
+
+* Mon Apr 20 2026 Siak Hooi <siakhooi@gmail.com> - 1.5.0
+- fix sonar issues
+- code refactor and cleanup
+- unit test coverage
+- enhancement: add --jexl-debug option to enable JEXL script engine debug
+- enhancement: add --log-level option to set root log level
+- enhancement: show script file when jexl error
+- enhancement: continue if context file empty
 
 * Mon Mar 16 2026 Siak Hooi <siakhooi@gmail.com> - 1.4.0
 - add stdout, stderr to the execution context
