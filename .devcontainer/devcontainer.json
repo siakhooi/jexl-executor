@@ -6,14 +6,12 @@
   "updateRemoteUserUID": true,
   "features": {},
   "mounts": [
-    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.m2,target=/home/maui/.m2,type=bind,consistency=cached",    "source=/mnt/c/Users/sing/Documents/artifacts,target=/artifacts,type=bind,consistency=cached",
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.m2,target=/home/maui/.m2,type=bind,consistency=cached",
     "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
   ],
   "customizations": {
     "vscode": {
       "extensions": [
-        "github.copilot",
-        "github.copilot-chat",
         "lfm.vscode-makefile-term",
         "yzhang.markdown-all-in-one",
         "vscjava.vscode-java-pack",
