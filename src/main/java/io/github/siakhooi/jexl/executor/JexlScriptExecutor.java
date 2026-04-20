@@ -41,8 +41,8 @@ public class JexlScriptExecutor {
     public Object execute(Map<String, Object> contextMap, String jexlScript, String sourceLabel) {
         logger.debug("Evaluating JEXL from '{}' ({} chars)", sourceLabel, jexlScript.length());
         JexlContext context = new MapContext(new HashMap<>(contextMap));
-        context.set("stdout", System.out);
-        context.set("stderr", System.err);
+        context.set("stdout", System.out); // NOSONAR intentional: bind real stdout for JEXL scripts
+        context.set("stderr", System.err); // NOSONAR intentional: bind real stderr for JEXL scripts
         var info = new JexlInfo(sourceLabel, 1, 1);
         var script = jexl.createScript(info, jexlScript);
         return script.execute(context);

@@ -43,8 +43,11 @@ public class FilesToFlowPath {
                         getExecutionType(file.getAbsolutePath())))
                 .toList();
         flowPath.setSteps(steps);
-        logger.debug("Resolved flow: {}",
-                steps.stream().map(s -> s.name() + "(" + s.executionType() + ")").collect(Collectors.joining(" -> ")));
+        if(logger.isDebugEnabled()) {
+            logger.debug("Resolved flow: {}",
+                    steps.stream().map(s -> String.format("%s(%s)", s.name(), s.executionType()))
+                            .collect(Collectors.joining(" -> ")));
+        }
         return flowPath;
     }
 

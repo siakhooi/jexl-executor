@@ -50,8 +50,10 @@ public class JexlExecutor {
             Map<String, Object> initialContextMap = ContextFileLoader.get(contextFile);
 
             FlowPath flowPath = FilesToFlowPath.generate(scriptFiles);
-            logger.debug("Script files in order: {}",
-                    scriptFiles.stream().map(f -> f.getName()).collect(Collectors.joining(", ")));
+            if(logger.isDebugEnabled()) {
+                logger.debug("Script files in order: {}",
+                        scriptFiles.stream().map(File::getName).collect(Collectors.joining(", ")));
+            }
 
             StepExecutor stepExecutor = new StepExecutor(resultPathTemplate, classLoader, jexlDebug);
 
