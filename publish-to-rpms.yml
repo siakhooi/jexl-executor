@@ -1,0 +1,9 @@
+repo: siakhooi/rpms
+branch: main
+git_commit_user: jexl-executor
+git_commit_email: jexl-executor@siakhooi.github.io
+git_commit_message: "jexl-executor: Auto deploy"
+
+files:
+  - source: siakhooi-jexl-executor-*.fc*.noarch.rpm
+    target: docs/

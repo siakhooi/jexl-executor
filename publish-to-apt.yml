@@ -1,0 +1,9 @@
+repo: siakhooi/apt
+branch: main
+git_commit_user: jexl-executor
+git_commit_email: jexl-executor@siakhooi.github.io
+git_commit_message: "jexl-executor: Auto deploy"
+
+files:
+  - source: siakhooi-jexl-executor_*_amd64.deb
+    target: docs/pool/main/binary-amd64/
