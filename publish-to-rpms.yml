@@ -7,3 +7,4 @@ git_commit_message: "jexl-executor: Auto deploy"
 files:
   - source: siakhooi-jexl-executor-*.fc*.noarch.rpm
     target: docs/
+    items: 1
