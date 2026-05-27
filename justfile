@@ -49,9 +49,10 @@ run-debug:
 qlty-check:
 	qlty check --all
 
+root := justfile_directory()
 docker-shellcheck:
-	docker run --rm -v $$(pwd):/workspaces docker.io/siakhooi/devcontainer:deb2604 scripts/shellcheck.sh
+	docker run --rm -v {{ root }}:/workspaces docker.io/siakhooi/devcontainer:deb2604 scripts/shellcheck.sh
 docker-build-deb:
-	docker run --rm -v $$(pwd):/workspaces docker.io/siakhooi/devcontainer:deb2604 scripts/build-deb.sh
+	docker run --rm -v {{ root }}:/workspaces docker.io/siakhooi/devcontainer:deb2604 scripts/build-deb.sh
 docker-build-rpm:
-	docker run --rm -v $$(pwd):/workspaces docker.io/siakhooi/devcontainer:rpm44 scripts/build-rpms.sh
+	docker run --rm -v {{ root }}:/workspaces docker.io/siakhooi/devcontainer:rpm44 scripts/build-rpms.sh
