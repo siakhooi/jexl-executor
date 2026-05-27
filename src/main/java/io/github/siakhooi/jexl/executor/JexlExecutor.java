@@ -1,7 +1,6 @@
 package io.github.siakhooi.jexl.executor;
 
 import java.io.File;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -15,19 +14,15 @@ public class JexlExecutor {
     private static final Logger logger = LoggerFactory.getLogger(JexlExecutor.class);
 
     private final File jarListFile;
-    private final File contextFile;
-    private final List<File> scriptFiles;
-    private final String resultPathTemplate;
+    private final FlowFileSpec flowFileSpec;
     private final Level rootLogLevel;
     private final boolean fullContext;
     private final boolean jexlDebug;
 
-    public JexlExecutor(File jarListFile, File contextFile, List<File> scriptFiles, String resultPathTemplate,
-            Level rootLogLevel, boolean fullContext, boolean jexlDebug) {
+    public JexlExecutor(File jarListFile, FlowFileSpec flowFileSpec, Level rootLogLevel, boolean fullContext,
+            boolean jexlDebug) {
         this.jarListFile = jarListFile;
-        this.contextFile = contextFile;
-        this.scriptFiles = scriptFiles;
-        this.resultPathTemplate = resultPathTemplate;
+        this.flowFileSpec = flowFileSpec;
         this.rootLogLevel = rootLogLevel;
         this.fullContext = fullContext;
         this.jexlDebug = jexlDebug;
@@ -37,8 +32,8 @@ public class JexlExecutor {
         LogLevelControl.setRootLogLevel(rootLogLevel);
         try {
             logger.debug("Starting execution with context file '{}' and {} script step(s)",
-                    contextFile.getAbsolutePath(), scriptFiles.size());
-            logger.debug("Result path template: {}", resultPathTemplate);
+                    flowFileSpec.contextFile().getAbsolutePath(), flowFileSpec.scriptFiles().size());
+            logger.debug("Result path template: {}", flowFileSpec.resultPathTemplate());
             if (jarListFile != null) {
                 logger.debug("JAR list file: {}", jarListFile.getAbsolutePath());
             }
@@ -47,15 +42,15 @@ public class JexlExecutor {
             }
 
             ClassLoader classLoader = ApplicationClassLoader.get(jarListFile);
-            Map<String, Object> initialContextMap = ContextFileLoader.get(contextFile);
+            Map<String, Object> initialContextMap = ContextFileLoader.get(flowFileSpec.contextFile());
 
-            FlowPath flowPath = FilesToFlowPath.generate(scriptFiles);
+            FlowPath flowPath = FilesToFlowPath.generate(flowFileSpec.scriptFiles());
             if(logger.isDebugEnabled()) {
                 logger.debug("Script files in order: {}",
-                        scriptFiles.stream().map(File::getName).collect(Collectors.joining(", ")));
+                        flowFileSpec.scriptFiles().stream().map(File::getName).collect(Collectors.joining(", ")));
             }
 
-            StepExecutor stepExecutor = new StepExecutor(resultPathTemplate, classLoader, jexlDebug);
+            StepExecutor stepExecutor = new StepExecutor(flowFileSpec.resultPathTemplate(), classLoader, jexlDebug);
 
             FlowExecutor flowExecutor = new FlowExecutor();
             FlowExecutor.Result flowResult = flowExecutor.execute(flowPath, stepExecutor, initialContextMap);

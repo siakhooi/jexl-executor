@@ -30,14 +30,9 @@ class JexlExecutorTest {
         Files.createFile(scriptPath);
         Files.writeString(contextPath, "{}\n");
 
-        JexlExecutor executor = new JexlExecutor(
-                jarListFile,
-                contextPath.toFile(),
-                Collections.singletonList(scriptPath.toFile()),
-                resultPathTemplate,
-                rootLogLevel,
-                fullContext,
-                jexlDebug);
+        FlowFileSpec flowFileSpec = new FlowFileSpec(
+                contextPath.toFile(), Collections.singletonList(scriptPath.toFile()), resultPathTemplate);
+        JexlExecutor executor = new JexlExecutor(jarListFile, flowFileSpec, rootLogLevel, fullContext, jexlDebug);
 
         // Act
         int result = executor.execute();
@@ -57,14 +52,8 @@ class JexlExecutorTest {
         boolean fullContext = false;
         boolean jexlDebug = false;
 
-        JexlExecutor executor = new JexlExecutor(
-                jarListFile,
-                contextFile,
-                Collections.singletonList(scriptFile),
-                resultPathTemplate,
-                rootLogLevel,
-                fullContext,
-                jexlDebug);
+        FlowFileSpec flowFileSpec = new FlowFileSpec(contextFile, Collections.singletonList(scriptFile), resultPathTemplate);
+        JexlExecutor executor = new JexlExecutor(jarListFile, flowFileSpec, rootLogLevel, fullContext, jexlDebug);
 
         // Act
         int result = executor.execute();

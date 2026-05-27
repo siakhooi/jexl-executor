@@ -52,9 +52,8 @@ public class ApplicationCommandLine implements Callable<Integer> {
         } catch (IllegalArgumentException e) {
             throw new ParameterException(spec.commandLine(), e.getMessage());
         }
-        return (new JexlExecutor(jarListFile, contextFile, scriptFiles, resultPathTemplate, rootLevel, fullContext,
-                jexlDebug))
-                .execute();
+        FlowFileSpec flowFileSpec = new FlowFileSpec(contextFile, scriptFiles, resultPathTemplate);
+        return (new JexlExecutor(jarListFile, flowFileSpec, rootLevel, fullContext, jexlDebug)).execute();
 
     }
 
