@@ -1,42 +1,107 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+#
+# Description: Build an RPM package from the source files.
+# Usage: ./build-rpms.sh [options]
+#
 
-jar_file_path=target/jexl-executor.jar
+set -euo pipefail
 
-rm -f  ~/.rpmmacros
-rm -rf ~/rpmbuild
-rpmdev-setuptree
+if [[ ! -f ./build.env ]]; then
+  echo "Error: build.env file not found. Please create it with the necessary variables."
+  exit 1
+fi
+# shellcheck disable=SC1091
+source ./build.env
+if [[ -z "${PACKAGE_NAME:-}" ]]; then
+  echo "Error: PACKAGE_NAME variable not set in build.env."
+  exit 1
+fi
 
-working_directory=$(realpath target/rpmbuild)
-mkdir -p "$working_directory"
-
+# ===== Constants =====
+readonly jar_file_path=target/jexl-executor.jar
 readonly SOURCE=src
+working_directory=$(realpath target/rpmbuild)
 
-# Spec File
-cp -v $SOURCE/RPMS/siakhooi-jexl-executor.spec ~/rpmbuild/SPECS
+# ===== Argument Parsing =====
+parse_args() {
+  while getopts "h" opt; do
+    case "${opt}" in
+    h)
+      usage
+      exit 0
+      ;;
+    *)
+      usage
+      exit 1
+      ;;
+    esac
+  done
+  shift $((OPTIND - 1))
+}
+# ===== Helper Functions =====
+clean_rpmbuild() {
+	rm -rf ~/rpmbuild
+  rm -f  ~/.rpmmacros
+}
+setup_rpmbuild_tree() {
+	rpmdev-setuptree
+}
+copy_spec_file() {
+  cp -v $SOURCE/RPMS/"${PACKAGE_NAME}.spec" ~/rpmbuild/SPECS
+}
+prepare_working_directory() {
+  mkdir -p "$working_directory"
+}
+copy_binary_files() {
+  mkdir -p "$working_directory/usr/bin"
+  cp -vr $SOURCE/deb/usr/bin "$working_directory/usr"
+  chmod 755 "$working_directory/usr/bin/"*
+}
+copy_jar_file(){
+  mkdir -p "$working_directory/usr/lib/java/siakhooi"
+  cp -v "$jar_file_path" "$working_directory/usr/lib/java/siakhooi"
+}
+copy_license_file(){
+  cp -vf ./LICENSE "$working_directory"
+}
+build_rpm_package(){
 
-# Binary File
-mkdir -p "$working_directory/usr/bin"
-cp -vr $SOURCE/deb/usr/bin "$working_directory/usr"
-chmod 755 "$working_directory/usr/bin/"*
+  rpmlint ~/rpmbuild/SPECS/"${PACKAGE_NAME}".spec
+  rpmbuild -bb -vv  --define "_working_directory $working_directory" ~/rpmbuild/SPECS/"${PACKAGE_NAME}".spec
+  cp -vf ~/rpmbuild/RPMS/noarch/"${PACKAGE_NAME}"-*.rpm .
 
-# Jar file
-mkdir -p "$working_directory/usr/lib/java/siakhooi"
-cp -v "$jar_file_path" "$working_directory/usr/lib/java/siakhooi"
+}
+query_rpm_package() {
+  tree ~/rpmbuild/
+  rpm -ql ~/rpmbuild/RPMS/noarch/"${PACKAGE_NAME}"-*.rpm
+}
+generate_rpm_checksums(){
+  rpm_file=$(basename "$(ls ./"${PACKAGE_NAME}"-*.rpm)")
 
-# License
-cp -vf ./LICENSE "$working_directory"
+  sha256sum "$rpm_file" >"$rpm_file.sha256sum"
+  sha512sum "$rpm_file" >"$rpm_file.sha512sum"
+}
+# ===== Main Logic =====
+main() {
 
-# build rpm file
-rpmlint ~/rpmbuild/SPECS/siakhooi-jexl-executor.spec
-rpmbuild -bb -vv  --define "_working_directory $working_directory" ~/rpmbuild/SPECS/siakhooi-jexl-executor.spec
-cp -vf ~/rpmbuild/RPMS/noarch/siakhooi-jexl-executor-*.rpm .
+  parse_args "$@"
 
-# query
-tree ~/rpmbuild/
-rpm -ql ~/rpmbuild/RPMS/noarch/siakhooi-jexl-executor-*.rpm
+  clean_rpmbuild
+  setup_rpmbuild_tree
 
-rpm_file=$(basename "$(ls ./siakhooi-jexl-executor-*.rpm)")
+  prepare_working_directory
+  copy_spec_file
 
-sha256sum "$rpm_file" >"$rpm_file.sha256sum"
-sha512sum "$rpm_file" >"$rpm_file.sha512sum"
+  copy_binary_files
+  copy_jar_file
+
+  copy_license_file
+
+  build_rpm_package
+  query_rpm_package
+
+  generate_rpm_checksums
+}
+
+# ===== Entrypoint =====
+main "$@"

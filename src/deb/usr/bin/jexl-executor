@@ -1,6 +1,17 @@
 #!/bin/bash
+set -euo pipefail
 
 readonly jarfile=/usr/lib/java/siakhooi/jexl-executor.jar
+readonly java=/usr/bin/java
 
-# use system java
-/usr/bin/java -jar "$jarfile" "$@"
+if ! [[ -f "$jarfile" && -r "$jarfile" && -s "$jarfile" ]]; then
+	printf '%s: missing, unreadable, or empty JAR: %s\n' "${0##*/}" "$jarfile" >&2
+	exit 1
+fi
+
+if ! [[ -x "$java" ]]; then
+	printf '%s: java not found or not executable: %s\n' "${0##*/}" "$java" >&2
+	exit 1
+fi
+
+exec "$java" -jar "$jarfile" "$@"
