@@ -1,6 +1,7 @@
 package io.github.siakhooi.jexl.executor;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -22,10 +23,13 @@ public class ApplicationCommandLine implements Callable<Integer> {
     @Option(names = { "--jarfile", "-j" }, description = "File containing JAR paths (one per line) to load for JEXL scripts")
     private File jarListFile;
 
-    @Parameters(index = "0", description = "Initial context JSON file")
+    @Option(names = { "--flow-spec", "-f" }, paramLabel = "<file.yaml>", description = "YAML file with contextFile, scriptFiles, and optional resultPathTemplate (mutually exclusive with positional arguments; relative paths resolve against the YAML file's directory)")
+    private File flowSpecYaml;
+
+    @Parameters(index = "0", arity = "0..1", description = "Initial context JSON file (required unless --flow-spec/-f is set)")
     private File contextFile;
 
-    @Parameters(index = "1..*", arity = "1..*", description = "JEXL script or JSON files to execute in sequence")
+    @Parameters(index = "1..*", arity = "0..*", description = "JEXL script or JSON files to execute in sequence (required unless --flow-spec/-f is set)")
     private List<File> scriptFiles;
 
     // Execution options group
@@ -52,7 +56,14 @@ public class ApplicationCommandLine implements Callable<Integer> {
         } catch (IllegalArgumentException e) {
             throw new ParameterException(spec.commandLine(), e.getMessage());
         }
-        FlowFileSpec flowFileSpec = new FlowFileSpec(contextFile, scriptFiles, resultPathTemplate);
+        FlowFileSpec flowFileSpec;
+        try {
+            flowFileSpec = FlowFileSpecResolver.resolve(flowSpecYaml, contextFile, scriptFiles, resultPathTemplate);
+        } catch (IllegalArgumentException e) {
+            throw new ParameterException(spec.commandLine(), e.getMessage());
+        } catch (IOException e) {
+            throw new ParameterException(spec.commandLine(), e.getMessage(), e);
+        }
         return (new JexlExecutor(jarListFile, flowFileSpec, rootLevel, fullContext, jexlDebug)).execute();
 
     }

@@ -29,20 +29,30 @@ $ sudo yum install siakhooi-jexl-executor
 
 ```
 $ jexl-executor -h
-Usage: jexl-executor [-FhV] [--debug] [-j=<jarListFile>] [-r=<resultPathTemplate>] <contextFile> <scriptFiles>...
+Usage: jexl-executor [-FhV] [--debug] [--jexl-debug] [-f=<file.yaml>] [-j=<jarListFile>] [--log-level=<level>]
+                     [-r=<resultPathTemplate>] [<contextFile>] [<scriptFiles>...]
 Execute JEXL scripts with JSON context in a chain
-      <contextFile>      Initial context JSON file
-      <scriptFiles>...   JEXL script or JSON files to execute in sequence
-      --debug            Enable debug mode
-  -F, --full             Print full context instead of result
-  -h, --help             Show this help message and exit.
+      [<contextFile>]       Initial context JSON file (required unless --flow-spec/-f is set)
+      [<scriptFiles>...]    JEXL script or JSON files to execute in sequence (required unless --flow-spec/-f is set)
+      --debug               Shorthand for --log-level debug
+  -f, --flow-spec=<file.yaml>
+                            YAML file with contextFile, scriptFiles, and optional resultPathTemplate (mutually
+                              exclusive with positional arguments; relative paths resolve against the YAML file's
+                              directory)
+  -F, --full                Print full context instead of result
+  -h, --help                Show this help message and exit.
   -j, --jarfile=<jarListFile>
-                         File containing JAR paths (one per line) to load for JEXL scripts
+                            File containing JAR paths (one per line) to load for JEXL scripts
+      --jexl-debug          Enable Apache Commons JEXL engine debug mode for richer diagnostics when a script fails
+                              (independent of --log-level)
+      --log-level=<level>   Root log level: trace, debug, info, warn, error, off, all (=trace) (default: info)
   -r, --result-path=<resultPathTemplate>
-                         Path template for results. Use {name} as placeholder for script basename (default: {name}).
-                           Examples: {name}, output.{name}, results.{name}.data
-  -V, --version          Print version information and exit.
+                            Path template for results. Use {name} as placeholder for script basename (default: {name}).
+                              Examples: {name}, output.{name}, results.{name}.data
+  -V, --version             Print version information and exit.
 ```
+
+Either pass **positional** arguments (`<contextFile> <scriptFiles>...`) or a **YAML flow spec** with `-f` / `--flow-spec` (not both). With `-f`, `resultPathTemplate` comes from the YAML (optional; defaults to `{name}`); `--result-path` applies only to the positional mode.
 
 ### Examples
 
@@ -53,7 +63,22 @@ $ jexl-executor -F initial-context.json step1.jexl step2.json step3.jexl
 
 $ jexl-executor -r 'output.{name}' initial-context.json step1.jexl step2.json step3.jexl
 
+$ jexl-executor -f ./my-flow.yaml
 ```
+
+### YAML flow spec (`-f` / `--flow-spec`)
+
+Paths in the YAML file may be relative; they are resolved against the **directory containing the YAML file**.
+
+```yaml
+contextFile: initial-context.json
+scriptFiles:
+  - step1.jexl
+  - step2.json
+  - step3.jexl
+resultPathTemplate: "output.{name}" # optional; defaults to {name}
+```
+
 ## URL
 
 ### Quality
