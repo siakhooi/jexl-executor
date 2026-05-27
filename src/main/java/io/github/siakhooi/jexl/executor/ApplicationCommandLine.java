@@ -23,7 +23,7 @@ public class ApplicationCommandLine implements Callable<Integer> {
     @Option(names = { "--jarfile", "-j" }, description = "File containing JAR paths (one per line) to load for JEXL scripts (mutually exclusive with jarListFile in a --flow-spec YAML file)")
     private File jarListFile;
 
-    @Option(names = { "--flow-spec", "-f" }, paramLabel = "<file.yaml>", description = "YAML file with contextFile, scriptFiles, and optional resultPathTemplate and jarListFile (mutually exclusive with positional arguments; relative paths resolve against the YAML file's directory)")
+    @Option(names = { "--flow-spec", "-f" }, paramLabel = "<file.yaml>", description = "YAML file with contextFile, scriptFiles, and optional resultPathTemplate, jarListFile, and exitCodeExpr (mutually exclusive with positional arguments; relative paths resolve against the YAML file's directory)")
     private File flowSpecYaml;
 
     @Parameters(index = "0", arity = "0..1", description = "Initial context JSON file (required unless --flow-spec/-f is set)")
@@ -48,6 +48,9 @@ public class ApplicationCommandLine implements Callable<Integer> {
     @Option(names = { "--jexl-debug" }, description = "Enable Apache Commons JEXL engine debug mode for richer diagnostics when a script fails (independent of --log-level)")
     private boolean jexlDebug;
 
+    @Option(names = { "--exit-code-expr", "-e" }, paramLabel = "<expr>", description = "Positional mode only: JEXL expression on the final merged context; integral numeric result becomes the process exit code. Not allowed with --flow-spec/-f (use exitCodeExpr in the YAML file instead).")
+    private String exitCodeExpr;
+
     @Override
     public Integer call() throws Exception {
         Level rootLevel;
@@ -58,7 +61,8 @@ public class ApplicationCommandLine implements Callable<Integer> {
         }
         FlowFileSpec flowFileSpec;
         try {
-            flowFileSpec = FlowFileSpecResolver.resolve(flowSpecYaml, contextFile, scriptFiles, resultPathTemplate);
+            flowFileSpec = FlowFileSpecResolver.resolve(flowSpecYaml, contextFile, scriptFiles, resultPathTemplate,
+                    exitCodeExpr);
         } catch (IllegalArgumentException e) {
             throw new ParameterException(spec.commandLine(), e.getMessage());
         } catch (IOException e) {
@@ -71,7 +75,7 @@ public class ApplicationCommandLine implements Callable<Integer> {
             throw new ParameterException(spec.commandLine(), e.getMessage());
         }
         FlowFileSpec runSpec = new FlowFileSpec(flowFileSpec.contextFile(), flowFileSpec.scriptFiles(),
-                flowFileSpec.resultPathTemplate(), effectiveJarListFile);
+                flowFileSpec.resultPathTemplate(), effectiveJarListFile, flowFileSpec.exitCodeExpr());
         return (new JexlExecutor(runSpec, rootLevel, fullContext, jexlDebug)).execute();
 
     }

@@ -30,7 +30,7 @@ class JexlExecutorTest {
         Files.writeString(contextPath, "{}\n");
 
         FlowFileSpec flowFileSpec = new FlowFileSpec(
-                contextPath.toFile(), Collections.singletonList(scriptPath.toFile()), resultPathTemplate, null);
+                contextPath.toFile(), Collections.singletonList(scriptPath.toFile()), resultPathTemplate, null, null);
         JexlExecutor executor = new JexlExecutor(flowFileSpec, rootLogLevel, fullContext, jexlDebug);
 
         // Act
@@ -50,7 +50,7 @@ class JexlExecutorTest {
         boolean fullContext = false;
         boolean jexlDebug = false;
 
-        FlowFileSpec flowFileSpec = new FlowFileSpec(contextFile, Collections.singletonList(scriptFile), resultPathTemplate, null);
+        FlowFileSpec flowFileSpec = new FlowFileSpec(contextFile, Collections.singletonList(scriptFile), resultPathTemplate, null, null);
         JexlExecutor executor = new JexlExecutor(flowFileSpec, rootLogLevel, fullContext, jexlDebug);
 
         // Act
@@ -58,5 +58,33 @@ class JexlExecutorTest {
 
         // Assert
         assertEquals(1, result, "Should return 1 on exception");
+    }
+
+    @Test
+    void execute_returnsEvaluatedExitCode(@TempDir Path tempDir) throws IOException {
+        Path contextPath = tempDir.resolve("context.json");
+        Path scriptPath = tempDir.resolve("script.jexl");
+        Files.writeString(contextPath, "{}\n");
+        Files.writeString(scriptPath, "41\n");
+
+        FlowFileSpec flowFileSpec = new FlowFileSpec(
+                contextPath.toFile(), Collections.singletonList(scriptPath.toFile()), "{name}", null, "script");
+        JexlExecutor executor = new JexlExecutor(flowFileSpec, Level.INFO, false, false);
+
+        assertEquals(41, executor.execute());
+    }
+
+    @Test
+    void execute_returnsOneWhenExitCodeExprYieldsNonNumber(@TempDir Path tempDir) throws IOException {
+        Path contextPath = tempDir.resolve("context.json");
+        Path scriptPath = tempDir.resolve("script.jexl");
+        Files.writeString(contextPath, "{}\n");
+        Files.writeString(scriptPath, "1\n");
+
+        FlowFileSpec flowFileSpec = new FlowFileSpec(
+                contextPath.toFile(), Collections.singletonList(scriptPath.toFile()), "{name}", null, "'nope'");
+        JexlExecutor executor = new JexlExecutor(flowFileSpec, Level.INFO, false, false);
+
+        assertEquals(1, executor.execute());
     }
 }

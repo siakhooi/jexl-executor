@@ -22,6 +22,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
  *   - step2.json
  * resultPathTemplate: "{name}"   # optional, defaults to {name}
  * jarListFile: jars.txt          # optional; same format as --jarfile (mutually exclusive with --jarfile/-j)
+ * exitCodeExpr: "status"         # optional JEXL on final context for process exit (--flow-spec mode only; no --exit-code-expr/-e)
  * </pre>
  */
 public final class FlowFileSpecYaml {
@@ -67,7 +68,12 @@ public final class FlowFileSpecYaml {
             jarList = resolvePath(baseDir, dto.jarListFile.trim());
         }
 
-        return new FlowFileSpec(context, scripts, template, jarList);
+        String exitCodeExpr = null;
+        if (dto.exitCodeExpr != null && !dto.exitCodeExpr.isBlank()) {
+            exitCodeExpr = dto.exitCodeExpr.trim();
+        }
+
+        return new FlowFileSpec(context, scripts, template, jarList, exitCodeExpr);
     }
 
     private static File resolvePath(File baseDir, String path) {
@@ -81,5 +87,6 @@ public final class FlowFileSpecYaml {
         public List<String> scriptFiles;
         public String resultPathTemplate;
         public String jarListFile;
+        public String exitCodeExpr;
     }
 }

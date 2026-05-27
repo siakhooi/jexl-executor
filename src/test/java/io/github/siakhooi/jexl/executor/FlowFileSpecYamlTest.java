@@ -36,6 +36,7 @@ class FlowFileSpecYamlTest {
         assertEquals(sub.resolve("step.jexl").toAbsolutePath().normalize(), spec.scriptFiles().get(0).toPath().normalize());
         assertEquals("output.{name}", spec.resultPathTemplate());
         assertNull(spec.jarListFile());
+        assertNull(spec.exitCodeExpr());
     }
 
     @Test
@@ -53,6 +54,7 @@ class FlowFileSpecYamlTest {
 
         assertEquals("{name}", spec.resultPathTemplate());
         assertNull(spec.jarListFile());
+        assertNull(spec.exitCodeExpr());
     }
 
     @Test
@@ -111,6 +113,7 @@ class FlowFileSpecYamlTest {
         assertEquals(ctx.toAbsolutePath().normalize(), spec.contextFile().toPath().normalize());
         assertEquals(List.of(script.toAbsolutePath().normalize()), spec.scriptFiles().stream().map(f -> f.toPath().normalize()).toList());
         assertNull(spec.jarListFile());
+        assertNull(spec.exitCodeExpr());
     }
 
     @Test
@@ -129,5 +132,22 @@ class FlowFileSpecYamlTest {
         FlowFileSpec spec = FlowFileSpecYaml.load(yaml.toFile());
 
         assertEquals(tempDir.resolve("jars.txt").toAbsolutePath().normalize(), spec.jarListFile().toPath().normalize());
+    }
+
+    @Test
+    void load_readsExitCodeExpr(@TempDir Path tempDir) throws IOException {
+        Files.writeString(tempDir.resolve("c.json"), "{}");
+        Files.writeString(tempDir.resolve("s.jexl"), "1");
+        Path yaml = tempDir.resolve("flow.yaml");
+        Files.writeString(yaml, """
+                contextFile: c.json
+                scriptFiles:
+                  - s.jexl
+                exitCodeExpr: "script + 40"
+                """);
+
+        FlowFileSpec spec = FlowFileSpecYaml.load(yaml.toFile());
+
+        assertEquals("script + 40", spec.exitCodeExpr());
     }
 }

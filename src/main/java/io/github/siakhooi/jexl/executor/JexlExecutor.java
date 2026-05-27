@@ -52,8 +52,16 @@ public class JexlExecutor {
             FlowExecutor flowExecutor = new FlowExecutor();
             FlowExecutor.Result flowResult = flowExecutor.execute(flowPath, stepExecutor, initialContextMap);
             Output.print(fullContext, flowResult.contextMap, flowResult.scriptResult);
-            logger.debug("Execution finished successfully");
-            return 0;
+            String exitExpr = flowFileSpec.exitCodeExpr();
+            if (exitExpr == null || exitExpr.isBlank()) {
+                logger.debug("Execution finished successfully");
+                return 0;
+            }
+            JexlScriptExecutor exitCodeJexl = new JexlScriptExecutor(classLoader, jexlDebug);
+            Object exitValue = exitCodeJexl.execute(flowResult.contextMap, exitExpr, "--exit-code-expr");
+            int exitCode = ExitCodeConverter.toProcessExitCode(exitValue);
+            logger.debug("Exit code expression evaluated to {}", exitCode);
+            return exitCode;
         } catch (Exception e) {
             logger.error("Execution failed: {}", e.getMessage(), e);
             return 1;
