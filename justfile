@@ -31,6 +31,11 @@ run:
 		examples/script2.jexl \
 		examples/script2a.json \
 		examples/script3.jexl
+run2:
+	java -jar target/jexl-executor.jar \
+		-e 'script2.total > 1000? 0: 1' \
+		examples/context.json \
+		examples/script2.jexl
 run-jexl-debug:
 	java -jar target/jexl-executor.jar --jexl-debug \
 		examples/context.json \
