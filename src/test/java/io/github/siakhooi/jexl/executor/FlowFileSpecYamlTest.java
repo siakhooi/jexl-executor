@@ -1,6 +1,7 @@
 package io.github.siakhooi.jexl.executor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -34,6 +35,7 @@ class FlowFileSpecYamlTest {
         assertEquals(1, spec.scriptFiles().size());
         assertEquals(sub.resolve("step.jexl").toAbsolutePath().normalize(), spec.scriptFiles().get(0).toPath().normalize());
         assertEquals("output.{name}", spec.resultPathTemplate());
+        assertNull(spec.jarListFile());
     }
 
     @Test
@@ -50,6 +52,7 @@ class FlowFileSpecYamlTest {
         FlowFileSpec spec = FlowFileSpecYaml.load(yaml.toFile());
 
         assertEquals("{name}", spec.resultPathTemplate());
+        assertNull(spec.jarListFile());
     }
 
     @Test
@@ -107,5 +110,24 @@ class FlowFileSpecYamlTest {
 
         assertEquals(ctx.toAbsolutePath().normalize(), spec.contextFile().toPath().normalize());
         assertEquals(List.of(script.toAbsolutePath().normalize()), spec.scriptFiles().stream().map(f -> f.toPath().normalize()).toList());
+        assertNull(spec.jarListFile());
+    }
+
+    @Test
+    void load_resolvesJarListFileRelativeToYamlDirectory(@TempDir Path tempDir) throws IOException {
+        Files.writeString(tempDir.resolve("c.json"), "{}");
+        Files.writeString(tempDir.resolve("s.jexl"), "1");
+        Files.writeString(tempDir.resolve("jars.txt"), "/tmp/placeholder.jar\n");
+        Path yaml = tempDir.resolve("flow.yaml");
+        Files.writeString(yaml, """
+                contextFile: c.json
+                scriptFiles:
+                  - s.jexl
+                jarListFile: jars.txt
+                """);
+
+        FlowFileSpec spec = FlowFileSpecYaml.load(yaml.toFile());
+
+        assertEquals(tempDir.resolve("jars.txt").toAbsolutePath().normalize(), spec.jarListFile().toPath().normalize());
     }
 }

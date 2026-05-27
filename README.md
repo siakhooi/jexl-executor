@@ -52,7 +52,7 @@ Execute JEXL scripts with JSON context in a chain
   -V, --version             Print version information and exit.
 ```
 
-Either pass **positional** arguments (`<contextFile> <scriptFiles>...`) or a **YAML flow spec** with `-f` / `--flow-spec` (not both). With `-f`, `resultPathTemplate` comes from the YAML (optional; defaults to `{name}`); `--result-path` applies only to the positional mode.
+Either pass **positional** arguments (`<contextFile> <scriptFiles>...`) or a **YAML flow spec** with `-f` / `--flow-spec` (not both). With `-f`, `resultPathTemplate` comes from the YAML (optional; defaults to `{name}`); `--result-path` applies only to the positional mode. Optional **`jarListFile`** in the YAML is the same kind of file as **`--jarfile` / `-j`** (one JAR path per line); you must not set both the YAML field and `-j` at the same time.
 
 ### Examples
 
@@ -77,6 +77,7 @@ scriptFiles:
   - step2.json
   - step3.jexl
 resultPathTemplate: "output.{name}" # optional; defaults to {name}
+jarListFile: jars.txt               # optional; same as --jarfile (do not use with -j)
 ```
 
 ## URL

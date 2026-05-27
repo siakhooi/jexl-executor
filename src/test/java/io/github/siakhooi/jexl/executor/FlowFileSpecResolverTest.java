@@ -1,6 +1,7 @@
 package io.github.siakhooi.jexl.executor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -27,6 +28,7 @@ class FlowFileSpecResolverTest {
         assertSame(ctx, spec.contextFile());
         assertEquals(scripts, spec.scriptFiles());
         assertEquals("out.{name}", spec.resultPathTemplate());
+        assertNull(spec.jarListFile());
     }
 
     @Test
@@ -46,6 +48,7 @@ class FlowFileSpecResolverTest {
         assertEquals(tempDir.resolve("c.json").toAbsolutePath().normalize(), spec.contextFile().toPath().normalize());
         assertEquals(1, spec.scriptFiles().size());
         assertEquals("x.{name}", spec.resultPathTemplate());
+        assertNull(spec.jarListFile());
     }
 
     @Test

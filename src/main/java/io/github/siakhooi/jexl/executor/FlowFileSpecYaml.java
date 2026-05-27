@@ -21,6 +21,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
  *   - step1.jexl
  *   - step2.json
  * resultPathTemplate: "{name}"   # optional, defaults to {name}
+ * jarListFile: jars.txt          # optional; same format as --jarfile (mutually exclusive with --jarfile/-j)
  * </pre>
  */
 public final class FlowFileSpecYaml {
@@ -61,7 +62,12 @@ public final class FlowFileSpecYaml {
             template = DEFAULT_RESULT_PATH_TEMPLATE;
         }
 
-        return new FlowFileSpec(context, scripts, template);
+        File jarList = null;
+        if (dto.jarListFile != null && !dto.jarListFile.isBlank()) {
+            jarList = resolvePath(baseDir, dto.jarListFile.trim());
+        }
+
+        return new FlowFileSpec(context, scripts, template, jarList);
     }
 
     private static File resolvePath(File baseDir, String path) {
@@ -74,5 +80,6 @@ public final class FlowFileSpecYaml {
         public String contextFile;
         public List<String> scriptFiles;
         public String resultPathTemplate;
+        public String jarListFile;
     }
 }

@@ -18,7 +18,6 @@ class JexlExecutorTest {
     @Test
     void execute_returnsZeroOnSuccess(@TempDir Path tempDir) throws IOException {
         // Arrange
-        File jarListFile = null; // or create a temp file if needed
         Path contextPath = tempDir.resolve("context.json");
         Path scriptPath = tempDir.resolve("script.jexl");
         String resultPathTemplate = "{name}";
@@ -31,8 +30,8 @@ class JexlExecutorTest {
         Files.writeString(contextPath, "{}\n");
 
         FlowFileSpec flowFileSpec = new FlowFileSpec(
-                contextPath.toFile(), Collections.singletonList(scriptPath.toFile()), resultPathTemplate);
-        JexlExecutor executor = new JexlExecutor(jarListFile, flowFileSpec, rootLogLevel, fullContext, jexlDebug);
+                contextPath.toFile(), Collections.singletonList(scriptPath.toFile()), resultPathTemplate, null);
+        JexlExecutor executor = new JexlExecutor(flowFileSpec, rootLogLevel, fullContext, jexlDebug);
 
         // Act
         int result = executor.execute();
@@ -44,7 +43,6 @@ class JexlExecutorTest {
     @Test
     void execute_returnsOneOnException() {
         // Arrange: Use invalid files to trigger exception
-        File jarListFile = null;
         File contextFile = new File("/invalid/path/context.json");
         File scriptFile = new File("/invalid/path/script.jexl");
         String resultPathTemplate = "{name}";
@@ -52,8 +50,8 @@ class JexlExecutorTest {
         boolean fullContext = false;
         boolean jexlDebug = false;
 
-        FlowFileSpec flowFileSpec = new FlowFileSpec(contextFile, Collections.singletonList(scriptFile), resultPathTemplate);
-        JexlExecutor executor = new JexlExecutor(jarListFile, flowFileSpec, rootLogLevel, fullContext, jexlDebug);
+        FlowFileSpec flowFileSpec = new FlowFileSpec(contextFile, Collections.singletonList(scriptFile), resultPathTemplate, null);
+        JexlExecutor executor = new JexlExecutor(flowFileSpec, rootLogLevel, fullContext, jexlDebug);
 
         // Act
         int result = executor.execute();

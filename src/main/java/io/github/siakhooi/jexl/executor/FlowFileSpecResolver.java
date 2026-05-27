@@ -35,6 +35,6 @@ public final class FlowFileSpecResolver {
             throw new IllegalArgumentException(
                     "Missing required parameters: specify --flow-spec/-f <file.yaml> or <contextFile> <scriptFiles>...");
         }
-        return new FlowFileSpec(contextFile, scriptFiles, resultPathTemplate);
+        return new FlowFileSpec(contextFile, scriptFiles, resultPathTemplate, null);
     }
 }
