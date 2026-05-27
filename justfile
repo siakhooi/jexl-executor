@@ -36,6 +36,15 @@ run2:
 		-e 'script2.total > 1000? 0: 1' \
 		examples/context.json \
 		examples/script2.jexl
+run2e:
+	java -jar target/jexl-executor.jar \
+		-e '@file:examples/exit.jexl' \
+		examples/context.json \
+		examples/script2.jexl
+run2e1:
+	cd examples && \
+	java -jar ../target/jexl-executor.jar \
+		-f flowfile.yaml
 run-jexl-debug:
 	java -jar target/jexl-executor.jar --jexl-debug \
 		examples/context.json \

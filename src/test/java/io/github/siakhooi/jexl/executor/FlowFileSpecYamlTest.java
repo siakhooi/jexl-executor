@@ -150,4 +150,22 @@ class FlowFileSpecYamlTest {
 
         assertEquals("script + 40", spec.exitCodeExpr());
     }
+
+    @Test
+    void load_exitCodeExprLoadsFromAtFile(@TempDir Path tempDir) throws IOException {
+        Files.writeString(tempDir.resolve("c.json"), "{}");
+        Files.writeString(tempDir.resolve("s.jexl"), "1");
+        Files.writeString(tempDir.resolve("exit-code.jexl"), "script + 40\n");
+        Path yaml = tempDir.resolve("flow.yaml");
+        Files.writeString(yaml, """
+                contextFile: c.json
+                scriptFiles:
+                  - s.jexl
+                exitCodeExpr: "@file:exit-code.jexl"
+                """);
+
+        FlowFileSpec spec = FlowFileSpecYaml.load(yaml.toFile());
+
+        assertEquals("script + 40\n", spec.exitCodeExpr());
+    }
 }

@@ -1,0 +1,1 @@
+script2.total > 1000? 0: 1

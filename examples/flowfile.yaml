@@ -1,0 +1,4 @@
+contextFile: context.json
+scriptFiles:
+  - script2.jexl
+exitCodeExpr: "@file:exit.jexl"

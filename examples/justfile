@@ -6,3 +6,6 @@ run-example2:
 
 run-example3:
 	jexl-executor context.json script3.jexl
+
+run-example2-e:
+	jexl-executor -e '@file:exit.jexl' context.json script2.jexl

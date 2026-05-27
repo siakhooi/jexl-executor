@@ -136,4 +136,18 @@ class FlowFileSpecResolverTest {
 
         assertEquals("script", spec.exitCodeExpr());
     }
+
+    @Test
+    void resolve_positionalMode_loadsExitCodeFromAtFile(@TempDir Path tempDir) throws IOException {
+        Files.writeString(tempDir.resolve("exit.jexl"), "7\n");
+        File ctx = tempDir.resolve("ctx.json").toFile();
+        Files.writeString(ctx.toPath(), "{}");
+        List<File> scripts = List.of(tempDir.resolve("s.jexl").toFile());
+        Files.writeString(scripts.get(0).toPath(), "1");
+
+        FlowFileSpec spec = FlowFileSpecResolver.resolve(null, ctx, scripts, "{name}",
+                "@file:" + tempDir.resolve("exit.jexl").toAbsolutePath());
+
+        assertEquals("7\n", spec.exitCodeExpr());
+    }
 }

@@ -8,9 +8,9 @@ import java.util.List;
  *
  * @param jarListFile optional file listing JAR paths (one per line); {@code null} when not configured or after
  *                    merging CLI/YAML so only one source applies
- * @param exitCodeExpr optional JEXL expression evaluated against the final merged context after all steps; when
- *                     non-null, its numeric value becomes the process exit code (from YAML {@code exitCodeExpr} with
- *                     {@code --flow-spec}, or from {@code --exit-code-expr}/{@code -e} in positional mode only)
+ * @param exitCodeExpr optional JEXL source evaluated against the final merged context after all steps; may be inline
+ *                     JEXL or loaded from a file when the stored value begins with {@code @file:} (resolved when the
+ *                     spec is built). When non-null, its numeric evaluation becomes the process exit code.
  */
 public record FlowFileSpec(File contextFile, List<File> scriptFiles, String resultPathTemplate, File jarListFile,
         String exitCodeExpr) {

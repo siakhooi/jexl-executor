@@ -48,7 +48,7 @@ public class ApplicationCommandLine implements Callable<Integer> {
     @Option(names = { "--jexl-debug" }, description = "Enable Apache Commons JEXL engine debug mode for richer diagnostics when a script fails (independent of --log-level)")
     private boolean jexlDebug;
 
-    @Option(names = { "--exit-code-expr", "-e" }, paramLabel = "<expr>", description = "Positional mode only: JEXL expression on the final merged context; integral numeric result becomes the process exit code. Not allowed with --flow-spec/-f (use exitCodeExpr in the YAML file instead).")
+    @Option(names = { "--exit-code-expr", "-e" }, paramLabel = "<expr>", description = "Positional mode only: JEXL expression on the final merged context, or @file:<path> to load JEXL from a file (relative paths use the current working directory). Integral numeric result becomes the process exit code. Not allowed with --flow-spec/-f (use exitCodeExpr in the YAML file instead).")
     private String exitCodeExpr;
 
     @Override

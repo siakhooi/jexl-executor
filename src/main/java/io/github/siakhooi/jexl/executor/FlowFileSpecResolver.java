@@ -42,6 +42,9 @@ public final class FlowFileSpecResolver {
                     "Missing required parameters: specify --flow-spec/-f <file.yaml> or <contextFile> <scriptFiles>...");
         }
         String exitExpr = (cliExitCodeExpr == null || cliExitCodeExpr.isBlank()) ? null : cliExitCodeExpr.trim();
+        if (exitExpr != null) {
+            exitExpr = ExitCodeExprSource.expand(exitExpr, null);
+        }
         return new FlowFileSpec(contextFile, scriptFiles, resultPathTemplate, null, exitExpr);
     }
 }
