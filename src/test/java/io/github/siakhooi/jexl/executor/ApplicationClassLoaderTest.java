@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
@@ -45,14 +46,14 @@ class ApplicationClassLoaderTest {
     void testGetWithValidJarListFile(@TempDir Path tempDir) throws Exception {
         // Create a dummy JAR file
         Path jarFile = tempDir.resolve("dummy.jar");
-        try (JarOutputStream jos = new JarOutputStream(java.nio.file.Files.newOutputStream(jarFile))) {
+        try (JarOutputStream jos = new JarOutputStream(Files.newOutputStream(jarFile))) {
             jos.putNextEntry(new ZipEntry("META-INF/MANIFEST.MF"));
             jos.write("Manifest-Version: 1.0\n".getBytes());
             jos.closeEntry();
         }
         // Create a jar list file
         Path jarListFile = tempDir.resolve("jars.txt");
-        java.nio.file.Files.write(jarListFile, (jarFile.toString() + System.lineSeparator()).getBytes());
+        Files.write(jarListFile, (jarFile.toString() + System.lineSeparator()).getBytes());
         // Should cover the branch where jarListFile is valid and JAR is loaded
         ClassLoader cl = ApplicationClassLoader.get(jarListFile.toFile());
         assertNotNull(cl);

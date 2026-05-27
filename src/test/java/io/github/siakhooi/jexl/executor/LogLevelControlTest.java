@@ -1,5 +1,6 @@
 package io.github.siakhooi.jexl.executor;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -87,9 +88,12 @@ class LogLevelControlTest {
     void parseLogLevel_unknownMessageMentionsLevelAndAllowedValues() {
         IllegalArgumentException ex =
                 assertThrows(IllegalArgumentException.class, () -> LogLevelControl.parseLogLevel("fictional"));
-        assertTrue(ex.getMessage().contains("Unknown log level"));
-        assertTrue(ex.getMessage().contains("fictional"));
-        assertTrue(ex.getMessage().contains("trace"));
-        assertTrue(ex.getMessage().contains("off"));
+        String message = ex.getMessage();
+        assertAll(
+                "parseLogLevel should explain the bad token and hint at valid levels (actual message: " + message + ")",
+                () -> assertTrue(message.contains("Unknown log level")),
+                () -> assertTrue(message.contains("fictional")),
+                () -> assertTrue(message.contains("trace")),
+                () -> assertTrue(message.contains("off")));
     }
 }

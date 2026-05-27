@@ -1,9 +1,11 @@
 package io.github.siakhooi.jexl.executor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
@@ -14,30 +16,24 @@ import ch.qos.logback.classic.Level;
 class JexlExecutorTest {
 
     @Test
-    void execute_returnsZeroOnSuccess(@TempDir File tempDir) {
+    void execute_returnsZeroOnSuccess(@TempDir Path tempDir) throws IOException {
         // Arrange
         File jarListFile = null; // or create a temp file if needed
-        File contextFile = new File(tempDir, "context.json");
-        File scriptFile = new File(tempDir, "script.jexl");
+        Path contextPath = tempDir.resolve("context.json");
+        Path scriptPath = tempDir.resolve("script.jexl");
         String resultPathTemplate = "{name}";
         Level rootLogLevel = Level.INFO;
         boolean fullContext = false;
         boolean jexlDebug = false;
 
-        // Create dummy files and write valid JSON to contextFile
-        try {
-            contextFile.createNewFile();
-            scriptFile.createNewFile();
-            // Write valid JSON to contextFile
-            java.nio.file.Files.writeString(contextFile.toPath(), "{}\n");
-        } catch (Exception e) {
-            fail("Failed to create temp files");
-        }
+        Files.createFile(contextPath);
+        Files.createFile(scriptPath);
+        Files.writeString(contextPath, "{}\n");
 
         JexlExecutor executor = new JexlExecutor(
                 jarListFile,
-                contextFile,
-                Collections.singletonList(scriptFile),
+                contextPath.toFile(),
+                Collections.singletonList(scriptPath.toFile()),
                 resultPathTemplate,
                 rootLogLevel,
                 fullContext,

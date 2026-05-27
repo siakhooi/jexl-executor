@@ -56,6 +56,7 @@ class JexlScriptExecutorTest {
         String script = "invalid syntax !!!";
         JexlException ex = assertThrows(JexlException.class,
                 () -> executor.execute(context, script, "my-step.jexl"));
-        assertTrue(ex.getMessage().contains("my-step.jexl"));
+        assertTrue(ex.getMessage().contains("my-step.jexl"),
+                () -> "JEXL error message should include source label; got: " + ex.getMessage());
     }
 }
