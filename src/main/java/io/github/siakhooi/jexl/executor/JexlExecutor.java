@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.jexl3.JexlBuilder;
+import org.apache.commons.jexl3.introspection.JexlPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +29,8 @@ public class JexlExecutor {
 
     public int execute() {
         LogLevelControl.setRootLogLevel(rootLogLevel);
+        JexlBuilder.setDefaultPermissions(JexlPermissions.UNRESTRICTED);
+
         try {
             logger.debug("Starting execution with context file '{}' and {} script step(s)",
                     flowFileSpec.contextFile().getAbsolutePath(), flowFileSpec.scriptFiles().size());
