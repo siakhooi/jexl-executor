@@ -1,4 +1,11 @@
-contextFile: context.json
-scriptFiles:
-  - script2.jexl
-exitCodeExpr: "@file:exit.jexl"
+resultPathTemplate: "{name}"
+flows:
+  default1:
+    contextFile: context.json
+    scriptFiles:
+      - script2.jexl
+    exitCodeExpr: "@file:exit.jexl"
+  flow3:
+    contextFile: context.json
+    scriptFiles:
+      - script3.jexl

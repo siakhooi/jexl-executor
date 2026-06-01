@@ -41,10 +41,14 @@ run2e:
 		-e '@file:examples/exit.jexl' \
 		examples/context.json \
 		examples/script2.jexl
-run2e1:
+runf1:
 	cd examples && \
 	java -jar ../target/jexl-executor.jar \
 		-f flowfile.yaml
+runf2:
+	cd examples && \
+	java -jar ../target/jexl-executor.jar \
+		-f flowfile.yaml --flow-id flow3
 run-jexl-debug:
 	java -jar target/jexl-executor.jar --jexl-debug \
 		examples/context.json \

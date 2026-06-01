@@ -29,7 +29,7 @@ $ sudo yum install siakhooi-jexl-executor
 
 ```
 $ jexl-executor -h
-Usage: jexl-executor [-FhV] [--debug] [--jexl-debug] [-e=<expr>] [-f=<file.yaml>] [-j=<jarListFile>]
+Usage: jexl-executor [-FhV] [--debug] [--jexl-debug] [-e=<expr>] [-f=<file.yaml>] [--flow-id=<id>] [-j=<jarListFile>]
                      [--log-level=<level>] [-r=<resultPathTemplate>] [<contextFile>] [<scriptFiles>...]
 Execute JEXL scripts with JSON context in a chain
       [<contextFile>]       Initial context JSON file (required unless --flow-spec/-f is set)
@@ -41,10 +41,12 @@ Execute JEXL scripts with JSON context in a chain
                               result becomes the process exit code. Not allowed with --flow-spec/-f (use exitCodeExpr
                               in the YAML file instead).
   -f, --flow-spec=<file.yaml>
-                            YAML file with contextFile, scriptFiles, and optional resultPathTemplate, jarListFile, and
-                              exitCodeExpr (mutually exclusive with positional arguments; relative paths resolve against
-                              the YAML file's directory)
+                            YAML file with global resultPathTemplate, jarListFile, and a flows map (each flow:
+                              contextFile, scriptFiles, optional exitCodeExpr). Mutually exclusive with positional
+                              arguments; relative paths resolve against the YAML file's directory
   -F, --full                Print full context instead of result
+      --flow-id=<id>        With --flow-spec/-f only: which flow id under 'flows' to run (default: default). Not
+                              allowed without -f
   -h, --help                Show this help message and exit.
   -j, --jarfile=<jarListFile>
                             File containing JAR paths (one per line) to load for JEXL scripts (mutually exclusive with
@@ -58,7 +60,7 @@ Execute JEXL scripts with JSON context in a chain
   -V, --version             Print version information and exit.
 ```
 
-Either pass **positional** arguments (`<contextFile> <scriptFiles>...`) or a **YAML flow spec** with `-f` / `--flow-spec` (not both). With `-f`, `resultPathTemplate` comes from the YAML (optional; defaults to `{name}`); `--result-path` applies only to the positional mode. Optional **`jarListFile`** in the YAML is the same kind of file as **`--jarfile` / `-j`** (one JAR path per line); you must not set both the YAML field and `-j` at the same time. Exit code from JEXL follows the same split: **`--exit-code-expr` / `-e`** is only for **positional** mode; with **`-f`**, configure optional **`exitCodeExpr`** in the YAML only (using `-e` together with `-f` is rejected). The value may be inline JEXL or **`@file:path`** to load script text from a file (YAML: relative paths resolve like other YAML paths; CLI: relative to the current working directory). The expression runs on the **final merged context** and must evaluate to an integral number (non-numeric results are errors).
+Either pass **positional** arguments (`<contextFile> <scriptFiles>...`) or a **YAML flow spec** with `-f` / `--flow-spec` (not both). With `-f`, `resultPathTemplate` and `jarListFile` are read from the YAML root; **`flows.<id>`** holds each flow's `contextFile`, `scriptFiles`, and optional `exitCodeExpr`. Without **`--flow-id`**, the flow id **`default`** is used (it must exist in the file unless you always pass **`--flow-id`**). **`--flow-id`** is only valid with **`-f`**; positional mode does not use flow ids. **`--result-path` / `-r`** applies only to positional mode. Optional **`jarListFile`** in the YAML is the same kind of file as **`--jarfile` / `-j`**; you must not set both the YAML field and `-j` at the same time. Exit code from JEXL: **`--exit-code-expr` / `-e`** is only for **positional** mode; with **`-f`**, set optional **`exitCodeExpr`** under the chosen flow (not with `-e`). Values may be inline JEXL or **`@file:path`** (YAML: paths relative to the YAML directory; CLI: relative to the current working directory). The expression runs on the **final merged context** and must evaluate to an integral number (non-numeric results are errors).
 
 ### Examples
 
@@ -70,6 +72,8 @@ $ jexl-executor -F initial-context.json step1.jexl step2.json step3.jexl
 $ jexl-executor -r 'output.{name}' initial-context.json step1.jexl step2.json step3.jexl
 
 $ jexl-executor -f ./my-flow.yaml
+
+$ jexl-executor -f ./my-flow.yaml --flow-id release
 ```
 
 ### YAML flow spec (`-f` / `--flow-spec`)
@@ -77,15 +81,21 @@ $ jexl-executor -f ./my-flow.yaml
 Paths in the YAML file may be relative; they are resolved against the **directory containing the YAML file**.
 
 ```yaml
-contextFile: initial-context.json
-scriptFiles:
-  - step1.jexl
-  - step2.json
-  - step3.jexl
-resultPathTemplate: "output.{name}" # optional; defaults to {name}
 jarListFile: jars.txt               # optional; same as --jarfile (do not use with -j)
-exitCodeExpr: "status"              # optional; inline JEXL (flow-spec mode only; do not use --exit-code-expr/-e with -f)
-# exitCodeExpr: "@file:exit-code.jexl"  # optional: load JEXL from file next to this YAML
+resultPathTemplate: "output.{name}" # optional; defaults to {name}
+flows:
+  default:                          # used when --flow-id is omitted
+    contextFile: initial-context.json
+    scriptFiles:
+      - step1.jexl
+      - step2.json
+      - step3.jexl
+    exitCodeExpr: "status"          # optional; inline JEXL (do not use --exit-code-expr/-e with -f)
+  release:                          # optional second flow; run with --flow-id release
+    contextFile: initial-context.json
+    scriptFiles:
+      - step1.jexl
+    exitCodeExpr: "@file:exit-code.jexl"
 ```
 
 ## URL

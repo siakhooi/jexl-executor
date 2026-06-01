@@ -19,12 +19,14 @@ public final class FlowFileSpecResolver {
      * @param resultPathTemplate used only in positional mode (CLI {@code --result-path})
      * @param cliExitCodeExpr from {@code --exit-code-expr} / {@code -e}; used only in positional mode (must be blank
      *                        when {@code flowSpecYaml} is set)
+     * @param yamlFlowId which {@code flows} entry to load when using YAML; {@code null} or blank means {@code "default"}
+     *                   ({@link FlowFileSpecYaml#DEFAULT_FLOW_ID}); ignored in positional mode
      * @return resolved spec
      * @throws IllegalArgumentException if arguments are mutually exclusive or incomplete
      * @throws IOException if the YAML file cannot be read or parsed (see {@link FlowFileSpecYaml#load})
      */
     public static FlowFileSpec resolve(File flowSpecYaml, File contextFile, List<File> scriptFiles,
-            String resultPathTemplate, String cliExitCodeExpr) throws IOException {
+            String resultPathTemplate, String cliExitCodeExpr, String yamlFlowId) throws IOException {
         boolean hasPositional = contextFile != null || (scriptFiles != null && !scriptFiles.isEmpty());
         if (flowSpecYaml != null && hasPositional) {
             throw new IllegalArgumentException(
@@ -35,7 +37,7 @@ public final class FlowFileSpecResolver {
                 throw new IllegalArgumentException(
                         "Do not use --exit-code-expr/-e with --flow-spec/-f; set exitCodeExpr in the YAML file instead");
             }
-            return FlowFileSpecYaml.load(flowSpecYaml);
+            return FlowFileSpecYaml.load(flowSpecYaml, yamlFlowId);
         }
         if (contextFile == null || scriptFiles == null || scriptFiles.isEmpty()) {
             throw new IllegalArgumentException(

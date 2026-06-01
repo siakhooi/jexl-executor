@@ -23,13 +23,15 @@ class FlowFileSpecYamlTest {
         Files.writeString(sub.resolve("ctx.json"), "{}");
         Files.writeString(sub.resolve("step.jexl"), "1");
         Files.writeString(yaml, """
-                contextFile: ctx.json
-                scriptFiles:
-                  - step.jexl
                 resultPathTemplate: "output.{name}"
+                flows:
+                  default:
+                    contextFile: ctx.json
+                    scriptFiles:
+                      - step.jexl
                 """);
 
-        FlowFileSpec spec = FlowFileSpecYaml.load(yaml.toFile());
+        FlowFileSpec spec = FlowFileSpecYaml.load(yaml.toFile(), FlowFileSpecYaml.DEFAULT_FLOW_ID);
 
         assertEquals(sub.resolve("ctx.json").toAbsolutePath().normalize(), spec.contextFile().toPath().normalize());
         assertEquals(1, spec.scriptFiles().size());
@@ -45,12 +47,14 @@ class FlowFileSpecYamlTest {
         Files.writeString(tempDir.resolve("c.json"), "{}");
         Files.writeString(tempDir.resolve("s.jexl"), "2");
         Files.writeString(yaml, """
-                contextFile: c.json
-                scriptFiles:
-                  - s.jexl
+                flows:
+                  default:
+                    contextFile: c.json
+                    scriptFiles:
+                      - s.jexl
                 """);
 
-        FlowFileSpec spec = FlowFileSpecYaml.load(yaml.toFile());
+        FlowFileSpec spec = FlowFileSpecYaml.load(yaml.toFile(), null);
 
         assertEquals("{name}", spec.resultPathTemplate());
         assertNull(spec.jarListFile());
@@ -61,23 +65,49 @@ class FlowFileSpecYamlTest {
     void load_rejectsEmptyScriptFiles(@TempDir Path tempDir) throws IOException {
         Path yaml = tempDir.resolve("bad.yaml");
         Files.writeString(yaml, """
-                contextFile: c.json
-                scriptFiles: []
+                flows:
+                  default:
+                    contextFile: c.json
+                    scriptFiles: []
                 """);
 
-        IOException ex = assertThrows(IOException.class, () -> FlowFileSpecYaml.load(yaml.toFile()));
+        IOException ex = assertThrows(IOException.class, () -> FlowFileSpecYaml.load(yaml.toFile(), "default"));
         assertTrue(ex.getMessage().contains("scriptFiles"));
     }
 
     @Test
-    void load_rejectsMissingContextFile(@TempDir Path tempDir) throws IOException {
+    void load_rejectsMissingFlows(@TempDir Path tempDir) throws IOException {
         Path yaml = tempDir.resolve("bad.yaml");
+        Files.writeString(yaml, "resultPathTemplate: \"{name}\"\n");
+
+        IOException ex = assertThrows(IOException.class, () -> FlowFileSpecYaml.load(yaml.toFile(), "default"));
+        assertTrue(ex.getMessage().contains("flows"));
+    }
+
+    @Test
+    void load_rejectsLegacyRootPipelineFields(@TempDir Path tempDir) throws IOException {
+        Path yaml = tempDir.resolve("legacy.yaml");
         Files.writeString(yaml, """
+                contextFile: c.json
                 scriptFiles:
-                  - a.jexl
+                  - s.jexl
                 """);
 
-        IOException ex = assertThrows(IOException.class, () -> FlowFileSpecYaml.load(yaml.toFile()));
+        IOException ex = assertThrows(IOException.class, () -> FlowFileSpecYaml.load(yaml.toFile(), "default"));
+        assertTrue(ex.getMessage().contains("flows"));
+    }
+
+    @Test
+    void load_rejectsMissingContextFileOnFlow(@TempDir Path tempDir) throws IOException {
+        Path yaml = tempDir.resolve("bad.yaml");
+        Files.writeString(yaml, """
+                flows:
+                  default:
+                    scriptFiles:
+                      - a.jexl
+                """);
+
+        IOException ex = assertThrows(IOException.class, () -> FlowFileSpecYaml.load(yaml.toFile(), "default"));
         assertTrue(ex.getMessage().contains("contextFile"));
     }
 
@@ -85,12 +115,14 @@ class FlowFileSpecYamlTest {
     void load_rejectsBlankScriptEntry(@TempDir Path tempDir) throws IOException {
         Path yaml = tempDir.resolve("bad.yaml");
         Files.writeString(yaml, """
-                contextFile: c.json
-                scriptFiles:
-                  - "   "
+                flows:
+                  default:
+                    contextFile: c.json
+                    scriptFiles:
+                      - "   "
                 """);
 
-        IOException ex = assertThrows(IOException.class, () -> FlowFileSpecYaml.load(yaml.toFile()));
+        IOException ex = assertThrows(IOException.class, () -> FlowFileSpecYaml.load(yaml.toFile(), "default"));
         assertTrue(ex.getMessage().contains("scriptFiles"));
     }
 
@@ -103,12 +135,14 @@ class FlowFileSpecYamlTest {
         Path yaml = tempDir.resolve("nested").resolve("f.yaml");
         Files.createDirectories(yaml.getParent());
         Files.writeString(yaml, String.format("""
-                contextFile: "%s"
-                scriptFiles:
-                  - "%s"
+                flows:
+                  default:
+                    contextFile: "%s"
+                    scriptFiles:
+                      - "%s"
                 """, ctx.toAbsolutePath(), script.toAbsolutePath()));
 
-        FlowFileSpec spec = FlowFileSpecYaml.load(yaml.toFile());
+        FlowFileSpec spec = FlowFileSpecYaml.load(yaml.toFile(), "default");
 
         assertEquals(ctx.toAbsolutePath().normalize(), spec.contextFile().toPath().normalize());
         assertEquals(List.of(script.toAbsolutePath().normalize()), spec.scriptFiles().stream().map(f -> f.toPath().normalize()).toList());
@@ -123,13 +157,15 @@ class FlowFileSpecYamlTest {
         Files.writeString(tempDir.resolve("jars.txt"), "/tmp/placeholder.jar\n");
         Path yaml = tempDir.resolve("flow.yaml");
         Files.writeString(yaml, """
-                contextFile: c.json
-                scriptFiles:
-                  - s.jexl
                 jarListFile: jars.txt
+                flows:
+                  default:
+                    contextFile: c.json
+                    scriptFiles:
+                      - s.jexl
                 """);
 
-        FlowFileSpec spec = FlowFileSpecYaml.load(yaml.toFile());
+        FlowFileSpec spec = FlowFileSpecYaml.load(yaml.toFile(), "default");
 
         assertEquals(tempDir.resolve("jars.txt").toAbsolutePath().normalize(), spec.jarListFile().toPath().normalize());
     }
@@ -140,13 +176,15 @@ class FlowFileSpecYamlTest {
         Files.writeString(tempDir.resolve("s.jexl"), "1");
         Path yaml = tempDir.resolve("flow.yaml");
         Files.writeString(yaml, """
-                contextFile: c.json
-                scriptFiles:
-                  - s.jexl
-                exitCodeExpr: "script + 40"
+                flows:
+                  default:
+                    contextFile: c.json
+                    scriptFiles:
+                      - s.jexl
+                    exitCodeExpr: "script + 40"
                 """);
 
-        FlowFileSpec spec = FlowFileSpecYaml.load(yaml.toFile());
+        FlowFileSpec spec = FlowFileSpecYaml.load(yaml.toFile(), "default");
 
         assertEquals("script + 40", spec.exitCodeExpr());
     }
@@ -158,14 +196,57 @@ class FlowFileSpecYamlTest {
         Files.writeString(tempDir.resolve("exit-code.jexl"), "script + 40\n");
         Path yaml = tempDir.resolve("flow.yaml");
         Files.writeString(yaml, """
-                contextFile: c.json
-                scriptFiles:
-                  - s.jexl
-                exitCodeExpr: "@file:exit-code.jexl"
+                flows:
+                  default:
+                    contextFile: c.json
+                    scriptFiles:
+                      - s.jexl
+                    exitCodeExpr: "@file:exit-code.jexl"
                 """);
 
-        FlowFileSpec spec = FlowFileSpecYaml.load(yaml.toFile());
+        FlowFileSpec spec = FlowFileSpecYaml.load(yaml.toFile(), "default");
 
         assertEquals("script + 40\n", spec.exitCodeExpr());
+    }
+
+    @Test
+    void load_throwsWhenFlowIdNotDefined(@TempDir Path tempDir) throws IOException {
+        Files.writeString(tempDir.resolve("c.json"), "{}");
+        Files.writeString(tempDir.resolve("s.jexl"), "1");
+        Path yaml = tempDir.resolve("flow.yaml");
+        Files.writeString(yaml, """
+                flows:
+                  default:
+                    contextFile: c.json
+                    scriptFiles:
+                      - s.jexl
+                """);
+
+        IOException ex = assertThrows(IOException.class, () -> FlowFileSpecYaml.load(yaml.toFile(), "missing"));
+        assertTrue(ex.getMessage().contains("missing"));
+        assertTrue(ex.getMessage().contains("default"));
+    }
+
+    @Test
+    void load_selectsNamedFlow(@TempDir Path tempDir) throws IOException {
+        Files.writeString(tempDir.resolve("a.json"), "{}");
+        Files.writeString(tempDir.resolve("b.json"), "{}");
+        Files.writeString(tempDir.resolve("x.jexl"), "1");
+        Path yaml = tempDir.resolve("flow.yaml");
+        Files.writeString(yaml, """
+                flows:
+                  default:
+                    contextFile: a.json
+                    scriptFiles:
+                      - x.jexl
+                  other:
+                    contextFile: b.json
+                    scriptFiles:
+                      - x.jexl
+                """);
+
+        FlowFileSpec spec = FlowFileSpecYaml.load(yaml.toFile(), "other");
+
+        assertEquals(tempDir.resolve("b.json").toAbsolutePath().normalize(), spec.contextFile().toPath().normalize());
     }
 }

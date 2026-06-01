@@ -23,8 +23,11 @@ public class ApplicationCommandLine implements Callable<Integer> {
     @Option(names = { "--jarfile", "-j" }, description = "File containing JAR paths (one per line) to load for JEXL scripts (mutually exclusive with jarListFile in a --flow-spec YAML file)")
     private File jarListFile;
 
-    @Option(names = { "--flow-spec", "-f" }, paramLabel = "<file.yaml>", description = "YAML file with contextFile, scriptFiles, and optional resultPathTemplate, jarListFile, and exitCodeExpr (mutually exclusive with positional arguments; relative paths resolve against the YAML file's directory)")
+    @Option(names = { "--flow-spec", "-f" }, paramLabel = "<file.yaml>", description = "YAML file with global resultPathTemplate, jarListFile, and a flows map (each flow: contextFile, scriptFiles, optional exitCodeExpr). Mutually exclusive with positional arguments; relative paths resolve against the YAML file's directory")
     private File flowSpecYaml;
+
+    @Option(names = "--flow-id", paramLabel = "<id>", description = "With --flow-spec/-f only: which flow id under 'flows' to run (default: default). Not allowed without -f")
+    private String flowId;
 
     @Parameters(index = "0", arity = "0..1", description = "Initial context JSON file (required unless --flow-spec/-f is set)")
     private File contextFile;
@@ -59,10 +62,17 @@ public class ApplicationCommandLine implements Callable<Integer> {
         } catch (IllegalArgumentException e) {
             throw new ParameterException(spec.commandLine(), e.getMessage());
         }
+        if (flowSpecYaml == null && flowId != null && !flowId.isBlank()) {
+            throw new ParameterException(spec.commandLine(), "Do not use --flow-id without --flow-spec/-f");
+        }
+        String yamlFlowId = null;
+        if (flowSpecYaml != null) {
+            yamlFlowId = (flowId == null || flowId.isBlank()) ? FlowFileSpecYaml.DEFAULT_FLOW_ID : flowId.trim();
+        }
         FlowFileSpec flowFileSpec;
         try {
             flowFileSpec = FlowFileSpecResolver.resolve(flowSpecYaml, contextFile, scriptFiles, resultPathTemplate,
-                    exitCodeExpr);
+                    exitCodeExpr, yamlFlowId);
         } catch (IllegalArgumentException e) {
             throw new ParameterException(spec.commandLine(), e.getMessage());
         } catch (IOException e) {
