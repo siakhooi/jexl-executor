@@ -27,3 +27,5 @@ sed -i "src/deb/DEBIAN/control" -e 's@Version: .*@Version: '"$RELEASE_VERSION"'@
 sed -i "src/RPMS/${PACKAGE_NAME}.spec" -e 's@Version:        .*@Version:        '"$RELEASE_VERSION"'@g'
 
 sed -i "src/main/java/io/github/siakhooi/jexl/executor/Version.java" -e 's@APPLICATION_VERSION = ".*"@APPLICATION_VERSION = "'"$RELEASE_VERSION"'"@g'
+
+sed -i 'release.ps1' -e "s/^\\\$ReleaseVersion = '.*'/\$ReleaseVersion = '${RELEASE_VERSION}'/"
