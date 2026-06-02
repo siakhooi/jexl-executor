@@ -48,7 +48,7 @@ runf1:
 runf2:
 	cd examples && \
 	java -jar ../target/jexl-executor.jar \
-		-f flowfile.yaml --flow-id flow3
+		-f flowfile.yaml --id flow3
 run-jexl-debug:
 	java -jar target/jexl-executor.jar --jexl-debug \
 		examples/context.json \

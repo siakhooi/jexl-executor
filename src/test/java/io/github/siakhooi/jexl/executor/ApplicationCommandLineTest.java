@@ -39,7 +39,7 @@ class ApplicationCommandLineTest {
     @Test
     void flowIdWithoutFlowSpec_exitsWithPicocliUserError() {
         CommandLine cmd = new CommandLine(new ApplicationCommandLine());
-        int exit = cmd.execute("--flow-id", "default", "/tmp/x.json", "/tmp/y.jexl");
+        int exit = cmd.execute("--id", "default", "/tmp/x.json", "/tmp/y.jexl");
 
         assertEquals(2, exit);
     }
@@ -52,7 +52,7 @@ class ApplicationCommandLineTest {
         Files.writeString(yaml, minimalFlowYaml());
 
         CommandLine cmd = new CommandLine(new ApplicationCommandLine());
-        int exit = cmd.execute("-f", yaml.toString(), "--flow-id", "nope");
+        int exit = cmd.execute("-f", yaml.toString(), "--id", "nope");
 
         assertEquals(2, exit);
     }
