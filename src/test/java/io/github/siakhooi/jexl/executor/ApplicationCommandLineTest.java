@@ -1,7 +1,9 @@
 package io.github.siakhooi.jexl.executor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,6 +23,24 @@ class ApplicationCommandLineTest {
                     scriptFiles:
                       - s.jexl
                 """;
+    }
+
+    @Test
+    void configOptionWithoutPath_setsDefaultFilename() {
+        CommandLine cmd = new CommandLine(new ApplicationCommandLine());
+        CommandLine.ParseResult pr = cmd.parseArgs("-c");
+        File f = pr.matchedOptionValue('c', null);
+        assertNotNull(f);
+        assertEquals("execution-config.yaml", f.getName());
+    }
+
+    @Test
+    void longConfigOptionWithoutPath_setsDefaultFilename() {
+        CommandLine cmd = new CommandLine(new ApplicationCommandLine());
+        CommandLine.ParseResult pr = cmd.parseArgs("--config");
+        File f = pr.matchedOptionValue("config", null);
+        assertNotNull(f);
+        assertEquals("execution-config.yaml", f.getName());
     }
 
     @Test

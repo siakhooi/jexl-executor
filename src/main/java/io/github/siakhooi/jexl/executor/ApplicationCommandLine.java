@@ -23,7 +23,7 @@ public class ApplicationCommandLine implements Callable<Integer> {
     @Option(names = { "--jarfile", "-j" }, description = "File containing JAR paths (one per line) to load for JEXL scripts (mutually exclusive with jarListFile in an execution config YAML file)")
     private File jarListFile;
 
-    @Option(names = { "--config", "-c" }, paramLabel = "<execution-config.yaml>", description = "YAML execution config: global resultPathTemplate, jarListFile, and a flows map (each flow: contextFile, scriptFiles, optional exitCodeExpr). Mutually exclusive with positional arguments; relative paths resolve against the YAML file's directory")
+    @Option(names = { "--config", "-c" }, paramLabel = "[<execution-config.yaml>]", arity = "0..1", fallbackValue = "execution-config.yaml", description = "YAML execution config: global resultPathTemplate, jarListFile, and a flows map (each flow: contextFile, scriptFiles, optional exitCodeExpr). If -c or --config is given without a path, uses execution-config.yaml in the current working directory. Mutually exclusive with positional arguments; relative paths resolve against the YAML file's directory")
     private File executionConfigYaml;
 
     @Option(names = "--id", paramLabel = "<id>", description = "With --config/-c only: which flow id under 'flows' to run (default: default). Not allowed without -c")

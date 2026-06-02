@@ -29,15 +29,17 @@ $ sudo yum install siakhooi-jexl-executor
 
 ```
 $ jexl-executor -h
-Usage: jexl-executor [-FhV] [--debug] [--jexl-debug] [-c=<execution-config.yaml>] [-e=<expr>] [--id=<id>] [-j=<jarListFile>]
-                     [--log-level=<level>] [-r=<resultPathTemplate>] [<contextFile>] [<scriptFiles>...]
+Usage: jexl-executor [-FhV] [--debug] [--jexl-debug] [-c[=[<execution-config.yaml>]]] [-e=<expr>] [--id=<id>]
+                     [-j=<jarListFile>] [--log-level=<level>] [-r=<resultPathTemplate>] [<contextFile>]
+                     [<scriptFiles>...]
 Execute JEXL scripts with JSON context in a chain
       [<contextFile>]       Initial context JSON file (required unless --config/-c is set)
       [<scriptFiles>...]    JEXL script or JSON files to execute in sequence (required unless --config/-c is set)
-  -c, --config=<execution-config.yaml>
+  -c, --config[=[<execution-config.yaml>]]
                             YAML execution config: global resultPathTemplate, jarListFile, and a flows map (each flow:
-                              contextFile, scriptFiles, optional exitCodeExpr). Mutually exclusive with positional
-                              arguments; relative paths resolve against the YAML file's directory
+                              contextFile, scriptFiles, optional exitCodeExpr). If -c or --config is given without a
+                              path, uses execution-config.yaml in the current working directory. Mutually exclusive
+                              with positional arguments; relative paths resolve against the YAML file's directory
       --debug               Shorthand for --log-level debug
   -e, --exit-code-expr=<expr>
                             Positional mode only: JEXL expression on the final merged context, or @file:<path> to load
@@ -60,7 +62,7 @@ Execute JEXL scripts with JSON context in a chain
   -V, --version             Print version information and exit.
 ```
 
-Either pass **positional** arguments (`<contextFile> <scriptFiles>...`) or an **execution config** YAML with `-c` / `--config` (not both). With `-c`, `resultPathTemplate` and `jarListFile` are read from the YAML root; **`flows.<id>`** holds each flow's `contextFile`, `scriptFiles`, and optional `exitCodeExpr`. Without **`--id`**, the flow id **`default`** is used (it must exist in the file unless you always pass **`--id`**). **`--id`** is only valid with **`-c`**; positional mode does not use flow ids. **`--result-path` / `-r`** applies only to positional mode. Optional **`jarListFile`** in the YAML is the same kind of file as **`--jarfile` / `-j`**; you must not set both the YAML field and `-j` at the same time. Exit code from JEXL: **`--exit-code-expr` / `-e`** is only for **positional** mode; with **`-c`**, set optional **`exitCodeExpr`** under the chosen flow (not with `-e`). Values may be inline JEXL or **`@file:path`** (YAML: paths relative to the YAML directory; CLI: relative to the current working directory). The expression runs on the **final merged context** and must evaluate to an integral number (non-numeric results are errors).
+Either pass **positional** arguments (`<contextFile> <scriptFiles>...`) or an **execution config** YAML with `-c` / `--config` (not both). **`--config` or `-c` alone** loads **`execution-config.yaml`** from the current working directory; otherwise pass the file path (for example `-c ./my.yaml`). With `-c`, `resultPathTemplate` and `jarListFile` are read from the YAML root; **`flows.<id>`** holds each flow's `contextFile`, `scriptFiles`, and optional `exitCodeExpr`. Without **`--id`**, the flow id **`default`** is used (it must exist in the file unless you always pass **`--id`**). **`--id`** is only valid with **`-c`**; positional mode does not use flow ids. **`--result-path` / `-r`** applies only to positional mode. Optional **`jarListFile`** in the YAML is the same kind of file as **`--jarfile` / `-j`**; you must not set both the YAML field and `-j` at the same time. Exit code from JEXL: **`--exit-code-expr` / `-e`** is only for **positional** mode; with **`-c`**, set optional **`exitCodeExpr`** under the chosen flow (not with `-e`). Values may be inline JEXL or **`@file:path`** (YAML: paths relative to the YAML directory; CLI: relative to the current working directory). The expression runs on the **final merged context** and must evaluate to an integral number (non-numeric results are errors).
 
 ### Examples
 
@@ -72,6 +74,8 @@ $ jexl-executor -F initial-context.json step1.jexl step2.json step3.jexl
 $ jexl-executor -r 'output.{name}' initial-context.json step1.jexl step2.json step3.jexl
 
 $ jexl-executor -c ./execution-config.yaml
+
+$ jexl-executor -c
 
 $ jexl-executor -c ./execution-config.yaml --id release
 ```
