@@ -1,6 +1,6 @@
 resultPathTemplate: "{name}"
 flows:
-  default1:
+  default:
     contextFile: context.json
     scriptFiles:
       - script2.jexl

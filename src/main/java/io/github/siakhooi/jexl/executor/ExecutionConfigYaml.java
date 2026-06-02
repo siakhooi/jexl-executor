@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 /**
- * Loads a {@link FlowFileSpec} from a YAML file. Relative paths are resolved against the YAML file's directory.
+ * Loads an {@link ExecutionConfig} from a YAML execution config file. Relative paths are resolved against the YAML file's directory.
  *
  * <p>Expected shape:
  *
@@ -32,20 +32,20 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
  *       - a.jexl
  * </pre>
  */
-public final class FlowFileSpecYaml {
+public final class ExecutionConfigYaml {
 
     public static final String DEFAULT_FLOW_ID = "default";
 
     private static final String DEFAULT_RESULT_PATH_TEMPLATE = "{name}";
 
-    private FlowFileSpecYaml() {
+    private ExecutionConfigYaml() {
     }
 
     /**
-     * @param yamlFile YAML flow spec file
+     * @param yamlFile YAML execution config file
      * @param requestedFlowId which entry under {@code flows} to run; {@code null} or blank means {@link #DEFAULT_FLOW_ID}
      */
-    public static FlowFileSpec load(File yamlFile, String requestedFlowId) throws IOException {
+    public static ExecutionConfig load(File yamlFile, String requestedFlowId) throws IOException {
         Objects.requireNonNull(yamlFile, "yamlFile");
         File baseDir = yamlFile.getAbsoluteFile().getParentFile();
         if (baseDir == null) {
@@ -58,7 +58,7 @@ public final class FlowFileSpecYaml {
         rejectLegacyRootPipelineFields(dto);
 
         if (dto.flows == null || dto.flows.isEmpty()) {
-            throw new IOException("YAML flow spec must set non-empty 'flows'");
+            throw new IOException("Execution config must set non-empty 'flows'");
         }
 
         String flowId = (requestedFlowId == null || requestedFlowId.isBlank())
@@ -66,26 +66,26 @@ public final class FlowFileSpecYaml {
                 : requestedFlowId.trim();
 
         if (!dto.flows.containsKey(flowId)) {
-            throw new IOException("YAML flow spec has no flow '" + flowId + "'; defined flows: "
+            throw new IOException("Execution config has no flow '" + flowId + "'; defined flows: "
                     + String.join(", ", new TreeSet<>(dto.flows.keySet())));
         }
         FlowBodyDto flow = dto.flows.get(flowId);
         if (flow == null) {
-            throw new IOException("YAML flow spec flows." + flowId + " must be a non-null mapping");
+            throw new IOException("Execution config flows." + flowId + " must be a non-null mapping");
         }
 
         if (flow.contextFile == null || flow.contextFile.isBlank()) {
-            throw new IOException("YAML flow spec flows." + flowId + " must set non-blank 'contextFile'");
+            throw new IOException("Execution config flows." + flowId + " must set non-blank 'contextFile'");
         }
         if (flow.scriptFiles == null || flow.scriptFiles.isEmpty()) {
-            throw new IOException("YAML flow spec flows." + flowId + " must set non-empty 'scriptFiles'");
+            throw new IOException("Execution config flows." + flowId + " must set non-empty 'scriptFiles'");
         }
 
         File context = resolvePath(baseDir, flow.contextFile.trim());
         List<File> scripts = new ArrayList<>(flow.scriptFiles.size());
         for (String path : flow.scriptFiles) {
             if (path == null || path.isBlank()) {
-                throw new IOException("YAML flow spec flows." + flowId + " 'scriptFiles' entries must be non-blank");
+                throw new IOException("Execution config flows." + flowId + " 'scriptFiles' entries must be non-blank");
             }
             scripts.add(resolvePath(baseDir, path.trim()));
         }
@@ -105,7 +105,7 @@ public final class FlowFileSpecYaml {
             exitCodeExpr = ExitCodeExprSource.expand(flow.exitCodeExpr.trim(), baseDir);
         }
 
-        return new FlowFileSpec(context, scripts, template, jarList, exitCodeExpr);
+        return new ExecutionConfig(context, scripts, template, jarList, exitCodeExpr);
     }
 
     private static void rejectLegacyRootPipelineFields(Dto dto) throws IOException {
@@ -114,7 +114,7 @@ public final class FlowFileSpecYaml {
                 || (dto.exitCodeExpr != null && !dto.exitCodeExpr.isBlank());
         if (legacy) {
             throw new IOException(
-                    "YAML flow spec must define contextFile, scriptFiles, and exitCodeExpr under 'flows:<id>:'; root-level contextFile/scriptFiles/exitCodeExpr are not supported");
+                    "Execution config must define contextFile, scriptFiles, and exitCodeExpr under 'flows:<id>:'; root-level contextFile/scriptFiles/exitCodeExpr are not supported");
         }
     }
 

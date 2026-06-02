@@ -16,14 +16,14 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class FlowFileSpecResolverTest {
+class ExecutionConfigResolverTest {
 
     @Test
-    void resolve_positionalMode_returnsFlowFileSpec() throws IOException {
+    void resolve_positionalMode_returnsExecutionConfig() throws IOException {
         File ctx = new File("/tmp/ctx.json");
         List<File> scripts = List.of(new File("/tmp/a.jexl"));
 
-        FlowFileSpec spec = FlowFileSpecResolver.resolve(null, ctx, scripts, "out.{name}", null, null);
+        ExecutionConfig spec = ExecutionConfigResolver.resolve(null, ctx, scripts, "out.{name}", null, null);
 
         assertSame(ctx, spec.contextFile());
         assertEquals(scripts, spec.scriptFiles());
@@ -46,7 +46,7 @@ class FlowFileSpecResolverTest {
                       - s.jexl
                 """);
 
-        FlowFileSpec spec = FlowFileSpecResolver.resolve(yaml.toFile(), null, null, "{ignored}", null, "default");
+        ExecutionConfig spec = ExecutionConfigResolver.resolve(yaml.toFile(), null, null, "{ignored}", null, "default");
 
         assertEquals(tempDir.resolve("c.json").toAbsolutePath().normalize(), spec.contextFile().toPath().normalize());
         assertEquals(1, spec.scriptFiles().size());
@@ -69,7 +69,7 @@ class FlowFileSpecResolverTest {
         Files.writeString(tempDir.resolve("s.jexl"), "1");
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> FlowFileSpecResolver.resolve(yaml.toFile(), new File("/any/context.json"), null, "{name}", null,
+                () -> ExecutionConfigResolver.resolve(yaml.toFile(), new File("/any/context.json"), null, "{name}", null,
                         "default"));
         assertTrue(ex.getMessage().contains("not both"));
     }
@@ -88,7 +88,7 @@ class FlowFileSpecResolverTest {
         Files.writeString(tempDir.resolve("s.jexl"), "1");
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> FlowFileSpecResolver.resolve(yaml.toFile(), null, List.of(new File("/other.jexl")), "{name}", null,
+                () -> ExecutionConfigResolver.resolve(yaml.toFile(), null, List.of(new File("/other.jexl")), "{name}", null,
                         "default"));
         assertTrue(ex.getMessage().contains("not both"));
     }
@@ -96,21 +96,21 @@ class FlowFileSpecResolverTest {
     @Test
     void resolve_nothingProvided_throwsIllegalArgumentException() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> FlowFileSpecResolver.resolve(null, null, null, "{name}", null, null));
+                () -> ExecutionConfigResolver.resolve(null, null, null, "{name}", null, null));
         assertTrue(ex.getMessage().contains("Missing required parameters"));
     }
 
     @Test
     void resolve_contextWithoutScripts_throwsIllegalArgumentException() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> FlowFileSpecResolver.resolve(null, new File("/ctx.json"), null, "{name}", null, null));
+                () -> ExecutionConfigResolver.resolve(null, new File("/ctx.json"), null, "{name}", null, null));
         assertTrue(ex.getMessage().contains("Missing required parameters"));
     }
 
     @Test
     void resolve_contextWithEmptyScripts_throwsIllegalArgumentException() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> FlowFileSpecResolver.resolve(null, new File("/ctx.json"), Collections.emptyList(), "{name}", null,
+                () -> ExecutionConfigResolver.resolve(null, new File("/ctx.json"), Collections.emptyList(), "{name}", null,
                         null));
         assertTrue(ex.getMessage().contains("Missing required parameters"));
     }
@@ -118,7 +118,7 @@ class FlowFileSpecResolverTest {
     @Test
     void resolve_scriptsWithoutContext_throwsIllegalArgumentException() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> FlowFileSpecResolver.resolve(null, null, List.of(new File("/a.jexl")), "{name}", null, null));
+                () -> ExecutionConfigResolver.resolve(null, null, List.of(new File("/a.jexl")), "{name}", null, null));
         assertTrue(ex.getMessage().contains("Missing required parameters"));
     }
 
@@ -127,7 +127,7 @@ class FlowFileSpecResolverTest {
         Path missing = tempDir.resolve("does-not-exist.yaml");
 
         assertThrows(IOException.class,
-                () -> FlowFileSpecResolver.resolve(missing.toFile(), null, null, "{name}", null, "default"));
+                () -> ExecutionConfigResolver.resolve(missing.toFile(), null, null, "{name}", null, "default"));
     }
 
     @Test
@@ -144,7 +144,7 @@ class FlowFileSpecResolverTest {
         Files.writeString(tempDir.resolve("s.jexl"), "1");
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> FlowFileSpecResolver.resolve(yaml.toFile(), null, null, "{name}", "0", "default"));
+                () -> ExecutionConfigResolver.resolve(yaml.toFile(), null, null, "{name}", "0", "default"));
         assertTrue(ex.getMessage().contains("--exit-code-expr"));
     }
 
@@ -153,7 +153,7 @@ class FlowFileSpecResolverTest {
         File ctx = new File("/tmp/ctx.json");
         List<File> scripts = List.of(new File("/tmp/a.jexl"));
 
-        FlowFileSpec spec = FlowFileSpecResolver.resolve(null, ctx, scripts, "out.{name}", "  script  ", null);
+        ExecutionConfig spec = ExecutionConfigResolver.resolve(null, ctx, scripts, "out.{name}", "  script  ", null);
 
         assertEquals("script", spec.exitCodeExpr());
     }
@@ -166,7 +166,7 @@ class FlowFileSpecResolverTest {
         List<File> scripts = List.of(tempDir.resolve("s.jexl").toFile());
         Files.writeString(scripts.get(0).toPath(), "1");
 
-        FlowFileSpec spec = FlowFileSpecResolver.resolve(null, ctx, scripts, "{name}",
+        ExecutionConfig spec = ExecutionConfigResolver.resolve(null, ctx, scripts, "{name}",
                 "@file:" + tempDir.resolve("exit.jexl").toAbsolutePath(), null);
 
         assertEquals("7\n", spec.exitCodeExpr());
@@ -190,7 +190,7 @@ class FlowFileSpecResolverTest {
                       - x.jexl
                 """);
 
-        FlowFileSpec spec = FlowFileSpecResolver.resolve(yaml.toFile(), null, null, "{name}", null, "alt");
+        ExecutionConfig spec = ExecutionConfigResolver.resolve(yaml.toFile(), null, null, "{name}", null, "alt");
 
         assertEquals(tempDir.resolve("b.json").toAbsolutePath().normalize(), spec.contextFile().toPath().normalize());
     }

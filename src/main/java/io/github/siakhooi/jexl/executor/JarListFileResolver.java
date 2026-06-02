@@ -3,7 +3,7 @@ package io.github.siakhooi.jexl.executor;
 import java.io.File;
 
 /**
- * Resolves the JAR list file from CLI and YAML flow spec (at most one source).
+ * Resolves the JAR list file from CLI and execution config YAML (at most one source).
  */
 public final class JarListFileResolver {
 
@@ -19,7 +19,7 @@ public final class JarListFileResolver {
     public static File resolve(File cliJarListFile, File yamlJarListFile) {
         if (cliJarListFile != null && yamlJarListFile != null) {
             throw new IllegalArgumentException(
-                    "Specify JAR list in either the flow YAML (jarListFile) or with --jarfile/-j, not both");
+                    "Specify JAR list in either the execution config YAML (jarListFile) or with --jarfile/-j, not both");
         }
         return cliJarListFile != null ? cliJarListFile : yamlJarListFile;
     }

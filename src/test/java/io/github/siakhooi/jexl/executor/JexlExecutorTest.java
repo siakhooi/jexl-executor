@@ -29,9 +29,9 @@ class JexlExecutorTest {
         Files.createFile(scriptPath);
         Files.writeString(contextPath, "{}\n");
 
-        FlowFileSpec flowFileSpec = new FlowFileSpec(
+        ExecutionConfig executionConfig = new ExecutionConfig(
                 contextPath.toFile(), Collections.singletonList(scriptPath.toFile()), resultPathTemplate, null, null);
-        JexlExecutor executor = new JexlExecutor(flowFileSpec, rootLogLevel, fullContext, jexlDebug);
+        JexlExecutor executor = new JexlExecutor(executionConfig, rootLogLevel, fullContext, jexlDebug);
 
         // Act
         int result = executor.execute();
@@ -50,8 +50,8 @@ class JexlExecutorTest {
         boolean fullContext = false;
         boolean jexlDebug = false;
 
-        FlowFileSpec flowFileSpec = new FlowFileSpec(contextFile, Collections.singletonList(scriptFile), resultPathTemplate, null, null);
-        JexlExecutor executor = new JexlExecutor(flowFileSpec, rootLogLevel, fullContext, jexlDebug);
+        ExecutionConfig executionConfig = new ExecutionConfig(contextFile, Collections.singletonList(scriptFile), resultPathTemplate, null, null);
+        JexlExecutor executor = new JexlExecutor(executionConfig, rootLogLevel, fullContext, jexlDebug);
 
         // Act
         int result = executor.execute();
@@ -67,9 +67,9 @@ class JexlExecutorTest {
         Files.writeString(contextPath, "{}\n");
         Files.writeString(scriptPath, "41\n");
 
-        FlowFileSpec flowFileSpec = new FlowFileSpec(
+        ExecutionConfig executionConfig = new ExecutionConfig(
                 contextPath.toFile(), Collections.singletonList(scriptPath.toFile()), "{name}", null, "script");
-        JexlExecutor executor = new JexlExecutor(flowFileSpec, Level.INFO, false, false);
+        JexlExecutor executor = new JexlExecutor(executionConfig, Level.INFO, false, false);
 
         assertEquals(41, executor.execute());
     }
@@ -81,9 +81,9 @@ class JexlExecutorTest {
         Files.writeString(contextPath, "{}\n");
         Files.writeString(scriptPath, "1\n");
 
-        FlowFileSpec flowFileSpec = new FlowFileSpec(
+        ExecutionConfig executionConfig = new ExecutionConfig(
                 contextPath.toFile(), Collections.singletonList(scriptPath.toFile()), "{name}", null, "'nope'");
-        JexlExecutor executor = new JexlExecutor(flowFileSpec, Level.INFO, false, false);
+        JexlExecutor executor = new JexlExecutor(executionConfig, Level.INFO, false, false);
 
         assertEquals(1, executor.execute());
     }

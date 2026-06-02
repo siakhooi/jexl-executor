@@ -20,19 +20,19 @@ public class ApplicationCommandLine implements Callable<Integer> {
     CommandSpec spec;
 
         // Input files group
-    @Option(names = { "--jarfile", "-j" }, description = "File containing JAR paths (one per line) to load for JEXL scripts (mutually exclusive with jarListFile in a --flow-spec YAML file)")
+    @Option(names = { "--jarfile", "-j" }, description = "File containing JAR paths (one per line) to load for JEXL scripts (mutually exclusive with jarListFile in an execution config YAML file)")
     private File jarListFile;
 
-    @Option(names = { "--flow-spec", "-f" }, paramLabel = "<file.yaml>", description = "YAML file with global resultPathTemplate, jarListFile, and a flows map (each flow: contextFile, scriptFiles, optional exitCodeExpr). Mutually exclusive with positional arguments; relative paths resolve against the YAML file's directory")
-    private File flowSpecYaml;
+    @Option(names = { "--config", "-c" }, paramLabel = "<execution-config.yaml>", description = "YAML execution config: global resultPathTemplate, jarListFile, and a flows map (each flow: contextFile, scriptFiles, optional exitCodeExpr). Mutually exclusive with positional arguments; relative paths resolve against the YAML file's directory")
+    private File executionConfigYaml;
 
-    @Option(names = "--id", paramLabel = "<id>", description = "With --flow-spec/-f only: which flow id under 'flows' to run (default: default). Not allowed without -f")
+    @Option(names = "--id", paramLabel = "<id>", description = "With --config/-c only: which flow id under 'flows' to run (default: default). Not allowed without -c")
     private String flowId;
 
-    @Parameters(index = "0", arity = "0..1", description = "Initial context JSON file (required unless --flow-spec/-f is set)")
+    @Parameters(index = "0", arity = "0..1", description = "Initial context JSON file (required unless --config/-c is set)")
     private File contextFile;
 
-    @Parameters(index = "1..*", arity = "0..*", description = "JEXL script or JSON files to execute in sequence (required unless --flow-spec/-f is set)")
+    @Parameters(index = "1..*", arity = "0..*", description = "JEXL script or JSON files to execute in sequence (required unless --config/-c is set)")
     private List<File> scriptFiles;
 
     // Execution options group
@@ -51,7 +51,7 @@ public class ApplicationCommandLine implements Callable<Integer> {
     @Option(names = { "--jexl-debug" }, description = "Enable Apache Commons JEXL engine debug mode for richer diagnostics when a script fails (independent of --log-level)")
     private boolean jexlDebug;
 
-    @Option(names = { "--exit-code-expr", "-e" }, paramLabel = "<expr>", description = "Positional mode only: JEXL expression on the final merged context, or @file:<path> to load JEXL from a file (relative paths use the current working directory). Integral numeric result becomes the process exit code. Not allowed with --flow-spec/-f (use exitCodeExpr in the YAML file instead).")
+    @Option(names = { "--exit-code-expr", "-e" }, paramLabel = "<expr>", description = "Positional mode only: JEXL expression on the final merged context, or @file:<path> to load JEXL from a file (relative paths use the current working directory). Integral numeric result becomes the process exit code. Not allowed with --config/-c (use exitCodeExpr in the execution config YAML instead).")
     private String exitCodeExpr;
 
     @Override
@@ -62,16 +62,16 @@ public class ApplicationCommandLine implements Callable<Integer> {
         } catch (IllegalArgumentException e) {
             throw new ParameterException(spec.commandLine(), e.getMessage());
         }
-        if (flowSpecYaml == null && flowId != null && !flowId.isBlank()) {
-            throw new ParameterException(spec.commandLine(), "Do not use --id without --flow-spec/-f");
+        if (executionConfigYaml == null && flowId != null && !flowId.isBlank()) {
+            throw new ParameterException(spec.commandLine(), "Do not use --id without --config/-c");
         }
         String yamlFlowId = null;
-        if (flowSpecYaml != null) {
-            yamlFlowId = (flowId == null || flowId.isBlank()) ? FlowFileSpecYaml.DEFAULT_FLOW_ID : flowId.trim();
+        if (executionConfigYaml != null) {
+            yamlFlowId = (flowId == null || flowId.isBlank()) ? ExecutionConfigYaml.DEFAULT_FLOW_ID : flowId.trim();
         }
-        FlowFileSpec flowFileSpec;
+        ExecutionConfig executionConfig;
         try {
-            flowFileSpec = FlowFileSpecResolver.resolve(flowSpecYaml, contextFile, scriptFiles, resultPathTemplate,
+            executionConfig = ExecutionConfigResolver.resolve(executionConfigYaml, contextFile, scriptFiles, resultPathTemplate,
                     exitCodeExpr, yamlFlowId);
         } catch (IllegalArgumentException e) {
             throw new ParameterException(spec.commandLine(), e.getMessage());
@@ -80,12 +80,12 @@ public class ApplicationCommandLine implements Callable<Integer> {
         }
         File effectiveJarListFile;
         try {
-            effectiveJarListFile = JarListFileResolver.resolve(jarListFile, flowFileSpec.jarListFile());
+            effectiveJarListFile = JarListFileResolver.resolve(jarListFile, executionConfig.jarListFile());
         } catch (IllegalArgumentException e) {
             throw new ParameterException(spec.commandLine(), e.getMessage());
         }
-        FlowFileSpec runSpec = new FlowFileSpec(flowFileSpec.contextFile(), flowFileSpec.scriptFiles(),
-                flowFileSpec.resultPathTemplate(), effectiveJarListFile, flowFileSpec.exitCodeExpr());
+        ExecutionConfig runSpec = new ExecutionConfig(executionConfig.contextFile(), executionConfig.scriptFiles(),
+                executionConfig.resultPathTemplate(), effectiveJarListFile, executionConfig.exitCodeExpr());
         return (new JexlExecutor(runSpec, rootLevel, fullContext, jexlDebug)).execute();
 
     }

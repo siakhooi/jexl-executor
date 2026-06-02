@@ -24,20 +24,20 @@ class ApplicationCommandLineTest {
     }
 
     @Test
-    void flowSpecWithExitCodeExprFlag_exitsWithPicocliUserError(@TempDir Path tempDir) throws IOException {
+    void executionConfigWithExitCodeExprFlag_exitsWithPicocliUserError(@TempDir Path tempDir) throws IOException {
         Files.writeString(tempDir.resolve("c.json"), "{}");
         Files.writeString(tempDir.resolve("s.jexl"), "1");
-        Path yaml = tempDir.resolve("flow.yaml");
+        Path yaml = tempDir.resolve("execution-config.yaml");
         Files.writeString(yaml, minimalFlowYaml());
 
         CommandLine cmd = new CommandLine(new ApplicationCommandLine());
-        int exit = cmd.execute("-f", yaml.toString(), "-e", "0");
+        int exit = cmd.execute("-c", yaml.toString(), "-e", "0");
 
         assertEquals(2, exit);
     }
 
     @Test
-    void flowIdWithoutFlowSpec_exitsWithPicocliUserError() {
+    void flowIdWithoutExecutionConfig_exitsWithPicocliUserError() {
         CommandLine cmd = new CommandLine(new ApplicationCommandLine());
         int exit = cmd.execute("--id", "default", "/tmp/x.json", "/tmp/y.jexl");
 
@@ -45,14 +45,14 @@ class ApplicationCommandLineTest {
     }
 
     @Test
-    void flowSpecWithUnknownFlowId_exitsWithPicocliUserError(@TempDir Path tempDir) throws IOException {
+    void executionConfigWithUnknownFlowId_exitsWithPicocliUserError(@TempDir Path tempDir) throws IOException {
         Files.writeString(tempDir.resolve("c.json"), "{}");
         Files.writeString(tempDir.resolve("s.jexl"), "1");
-        Path yaml = tempDir.resolve("flow.yaml");
+        Path yaml = tempDir.resolve("execution-config.yaml");
         Files.writeString(yaml, minimalFlowYaml());
 
         CommandLine cmd = new CommandLine(new ApplicationCommandLine());
-        int exit = cmd.execute("-f", yaml.toString(), "--id", "nope");
+        int exit = cmd.execute("-c", yaml.toString(), "--id", "nope");
 
         assertEquals(2, exit);
     }

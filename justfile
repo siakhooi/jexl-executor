@@ -44,11 +44,11 @@ run2e:
 runf1:
 	cd examples && \
 	java -jar ../target/jexl-executor.jar \
-		-f flowfile.yaml
+		-c execution-config.yaml
 runf2:
 	cd examples && \
 	java -jar ../target/jexl-executor.jar \
-		-f flowfile.yaml --id flow3
+		-c execution-config.yaml --id flow3
 run-jexl-debug:
 	java -jar target/jexl-executor.jar --jexl-debug \
 		examples/context.json \
