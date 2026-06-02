@@ -11,9 +11,15 @@ if (-not (Test-Path -LiteralPath $releasePs1)) {
 if ([string]::IsNullOrWhiteSpace($ReleaseVersion)) {
     throw '$ReleaseVersion is not set or empty in release.ps1'
 }
+if ([string]::IsNullOrWhiteSpace($ReleasePackageName)) {
+    throw '$ReleasePackageName is not set or empty in release.ps1'
+}
+if ([string]::IsNullOrWhiteSpace($ReleaseVendor)) {
+    throw '$ReleaseVendor is not set or empty in release.ps1'
+}
 $VERSION = $ReleaseVersion
-$PACKAGE_NAME = 'jexl-executor'
-$VENDOR = if ($ReleaseVendor) { $ReleaseVendor } else { 'Siak Hooi' }
+$PACKAGE_NAME = $ReleasePackageName
+$VENDOR = $ReleaseVendor
 
 $jar = Join-Path (Join-Path $RepoRoot 'target') "${PACKAGE_NAME}.jar"
 if (-not (Test-Path -LiteralPath $jar)) {

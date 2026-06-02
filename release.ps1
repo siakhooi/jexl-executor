@@ -5,3 +5,4 @@
 
 $ReleaseVersion = '1.5.0'
 $ReleaseVendor  = 'Siak Hooi'
+$ReleasePackageName = 'jexl-executor'
