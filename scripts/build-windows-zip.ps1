@@ -15,7 +15,7 @@ $VERSION = $ReleaseVersion
 $PACKAGE_NAME = 'jexl-executor'
 $VENDOR = if ($ReleaseVendor) { $ReleaseVendor } else { 'Siak Hooi' }
 
-$jar = Join-Path (Join-Path $RepoRoot 'target') "${PACKAGE_NAME}-${VERSION}.jar"
+$jar = Join-Path (Join-Path $RepoRoot 'target') "${PACKAGE_NAME}.jar"
 if (-not (Test-Path -LiteralPath $jar)) {
     throw "JAR not found: $jar (run Maven package from repo root first)"
 }
@@ -43,7 +43,7 @@ if ($LASTEXITCODE -ne 0) {
 
 Push-Location -LiteralPath $jpackageRoot
 try {
-    $mainJar = "${PACKAGE_NAME}-${VERSION}.jar"
+    $mainJar = "${PACKAGE_NAME}.jar"
     & jpackage.exe `
         --type app-image `
         --name $PACKAGE_NAME `
