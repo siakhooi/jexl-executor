@@ -3,6 +3,6 @@
 #
 # Keep $ReleaseVersion in sync with RELEASE_VERSION in release.env (Linux / shell).
 
-$ReleaseVersion = '1.5.0'
+$ReleaseVersion = '1.6.0'
 $ReleaseVendor  = 'Siak Hooi'
 $ReleasePackageName = 'jexl-executor'

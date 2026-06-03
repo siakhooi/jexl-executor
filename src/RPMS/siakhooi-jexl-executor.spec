@@ -1,5 +1,5 @@
 Name:           siakhooi-jexl-executor
-Version:        1.5.0
+Version:        1.6.0
 Release:        1%{?dist}
 Summary:        jexl scripts executor
 
@@ -29,6 +29,15 @@ install %{_working_directory}/LICENSE %{_builddir}
 %{_libdir}/java/siakhooi/jexl-executor.jar
 
 %changelog
+
+* Wed Jun 3 2026 Siak Hooi <siakhooi@gmail.com> - 1.6.0
+- enhancement: add YAML execution config (-c/--config) with flows map, optional root jarListFile, and --id to choose a flow (default id: default)
+- enhancement: when -c/--config is given without a path, load execution-config.yaml from the current working directory
+- enhancement: add --exit-code-expr/-e for positional mode; optional per-flow exitCodeExpr in YAML (inline or @file:)
+- enhancement: set default JEXL engine permissions to unrestricted
+- enhancement: replace Makefile with justfile; harden shell scripts used in build/release
+- enhancement: add Windows zip build and publish flows; use publish-to-repo-action for apt/rpm publishing
+- enhancement: bump dependencies (Logback, Jackson, SLF4J, JUnit, Surefire, publish-to-repo-action)
 
 * Mon Apr 20 2026 Siak Hooi <siakhooi@gmail.com> - 1.5.0
 - fix sonar issues
