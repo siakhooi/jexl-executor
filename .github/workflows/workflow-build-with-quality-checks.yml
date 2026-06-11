@@ -22,9 +22,9 @@ jobs:
   build-rpm:
     needs: build-maven
     uses: ./.github/workflows/build-rpm.yml
-  build-windows-zip:
+  build-windows-packages:
     needs: build-maven
-    uses: ./.github/workflows/build-windows-zip.yml
+    uses: ./.github/workflows/build-windows-packages.yml
   sonarcloud:
     needs: [build-maven, build-deb]
     uses: ./.github/workflows/quality-sonarcloud.yml

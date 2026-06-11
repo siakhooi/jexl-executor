@@ -1,4 +1,4 @@
-name: Build Windows Zip
+name: Build Windows packages
 
 on: workflow_call
 
@@ -21,13 +21,15 @@ jobs:
           name: target
           path: ./target/
 
-      - name: Run build script
+      - name: Build Windows zip, EXE installer, and MSI
         shell: pwsh
         run: |
-          .\scripts\build-windows-zip.ps1
+          .\scripts\build-windows-packages.ps1
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
         with:
-          name: windows-zip-deliverables
+          name: windows-deliverables
           path: |
             ./*-windows-x64.zip
+            ./jexl-executor-*.exe
+            ./jexl-executor-*.msi

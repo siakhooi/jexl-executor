@@ -1,5 +1,5 @@
 Name:           siakhooi-jexl-executor
-Version:        1.6.1
+Version:        1.6.2
 Release:        1%{?dist}
 Summary:        jexl scripts executor
 
@@ -29,6 +29,9 @@ install %{_working_directory}/LICENSE %{_builddir}
 %{_libdir}/java/siakhooi/jexl-executor.jar
 
 %changelog
+
+* Thu Jun 11 2026 Siak Hooi <siakhooi@gmail.com> - 1.6.2
+- remove wrapper, add exe and msi
 
 * Thu Jun 11 2026 Siak Hooi <siakhooi@gmail.com> - 1.6.1
 - fix: add wrapper to Windows zip package
