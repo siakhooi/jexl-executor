@@ -1,5 +1,5 @@
 Name:           siakhooi-jexl-executor
-Version:        1.6.0
+Version:        1.6.1
 Release:        1%{?dist}
 Summary:        jexl scripts executor
 
@@ -29,6 +29,9 @@ install %{_working_directory}/LICENSE %{_builddir}
 %{_libdir}/java/siakhooi/jexl-executor.jar
 
 %changelog
+
+* Thu Jun 11 2026 Siak Hooi <siakhooi@gmail.com> - 1.6.1
+- fix: add wrapper to Windows zip package
 
 * Wed Jun 3 2026 Siak Hooi <siakhooi@gmail.com> - 1.6.0
 - enhancement: add YAML execution config (-c/--config) with flows map, optional root jarListFile, and --id to choose a flow (default id: default)
