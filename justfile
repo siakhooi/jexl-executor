@@ -1,5 +1,3 @@
-all-deb: clean set-version build build-deb
-all-rpm: clean set-version build build-rpms
 jar: clean set-version build
 
 clean:

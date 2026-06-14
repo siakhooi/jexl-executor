@@ -9,7 +9,7 @@
 # $ReleaseMacPackageIdentifier: jpackage --mac-package-identifier; keep in sync with
 # RELEASE_MAC_PACKAGE_IDENTIFIER in release.env.
 
-$ReleaseVersion = '1.6.2'
+$ReleaseVersion = '1.6.3'
 $ReleaseVendor  = 'Siak Hooi'
 $ReleasePackageName = 'jexl-executor'
 $ReleaseWinUpgradeUuid = 'a83f5c2e-1d4b-5f6a-9e7c-2b4d6e8f0a1c'
