@@ -39,7 +39,6 @@ common=(
 	--runtime-image runtime
 	--app-version "$VERSION"
 	--vendor "$VENDOR"
-	--mac-console
 	--mac-package-identifier "$RELEASE_MAC_PACKAGE_IDENTIFIER"
 	--mac-sign false
 )
