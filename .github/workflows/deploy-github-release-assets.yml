@@ -26,6 +26,10 @@ jobs:
           path: ./
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
+          name: macos-deliverables
+          path: ./
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
           name: target
           path: ./target/
 
@@ -81,3 +85,18 @@ jobs:
           repo_token: ${{ secrets.TOKEN_TO_UPLOAD_ASSETS }}
           file_glob: true
           file: ./jexl-executor-*.msi
+      - uses: svenstaro/upload-release-action@29e53e917877a24fad85510ded594ab3c9ca12de # 2.11.5
+        with:
+          repo_token: ${{ secrets.TOKEN_TO_UPLOAD_ASSETS }}
+          file_glob: true
+          file: ./jexl-executor-*-macos-*.zip
+      - uses: svenstaro/upload-release-action@29e53e917877a24fad85510ded594ab3c9ca12de # 2.11.5
+        with:
+          repo_token: ${{ secrets.TOKEN_TO_UPLOAD_ASSETS }}
+          file_glob: true
+          file: ./jexl-executor-*.dmg
+      - uses: svenstaro/upload-release-action@29e53e917877a24fad85510ded594ab3c9ca12de # 2.11.5
+        with:
+          repo_token: ${{ secrets.TOKEN_TO_UPLOAD_ASSETS }}
+          file_glob: true
+          file: ./jexl-executor-*.pkg
