@@ -40,7 +40,7 @@ common=(
 	--app-version "$VERSION"
 	--vendor "$VENDOR"
 	--mac-package-identifier "$RELEASE_MAC_PACKAGE_IDENTIFIER"
-	--mac-sign false
+	# Omit --mac-sign: it is a boolean flag only (no "=false"); CI builds unsigned artifacts.
 )
 
 (
