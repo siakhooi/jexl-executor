@@ -124,6 +124,7 @@ public final class ExecutionConfigYaml {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
+    @SuppressWarnings("java:S1104") // Jackson YAML binding DTO; public fields intentional
     static final class Dto {
         /** Legacy root keys; if set, {@link #rejectLegacyRootPipelineFields} rejects the file. */
         public String contextFile;
@@ -136,6 +137,7 @@ public final class ExecutionConfigYaml {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
+    @SuppressWarnings("java:S1104") // Jackson YAML binding DTO; public fields intentional
     static final class FlowBodyDto {
         public String contextFile;
         public List<String> scriptFiles;
