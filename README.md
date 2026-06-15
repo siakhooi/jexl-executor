@@ -2,29 +2,6 @@
 
 jexl scripts executor
 
-## Installation
-
-### Ubuntu/Debian
-
-```bash
-$ sudo curl -L https://siakhooi.github.io/apt/siakhooi-apt.list | sudo tee /etc/apt/sources.list.d/siakhooi-apt.list > /dev/null
-$ sudo curl -L https://siakhooi.github.io/apt/siakhooi-apt.gpg  | sudo tee /usr/share/keyrings/siakhooi-apt.gpg > /dev/null
-$ sudo apt update
-
-$ sudo apt install siakhooi-jexl-executor
-```
-
-### Fedora/Red Hat
-
-```bash
-$ sudo curl -L https://siakhooi.github.io/rpms/siakhooi-rpms.repo | sudo tee /etc/yum.repos.d/siakhooi-rpms.repo > /dev/null
-
-$ sudo dnf install siakhooi-jexl-executor
-# or
-$ sudo yum install siakhooi-jexl-executor
-
-```
-
 ## Usage
 
 ```
@@ -102,9 +79,11 @@ flows:
     exitCodeExpr: "@file:exit-code.jexl"
 ```
 
-## URL
+## Installation
 
-### Quality
+See [Installation.md](Installation.md) for Homebrew, Linux packages, Windows winget, and manual binary installs.
+
+## Quality
 
 - Qlty.sh: <https://qlty.sh/gh/siakhooi/projects/jexl-executor>
 - SonarCloud: <https://sonarcloud.io/project/overview?id=siakhooi_jexl-executor>
