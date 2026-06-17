@@ -50,7 +50,7 @@ final class ExitCodeConverter {
             }
         }
         long lv = num.longValue();
-        if (lv != (long) (int) lv) {
+        if (lv != (int) lv) {
             throw new IllegalArgumentException("Exit code expression out of int range: " + value);
         }
         return (int) lv;
@@ -58,7 +58,7 @@ final class ExitCodeConverter {
 
     private static int doubleWholeToInt(double d) {
         long lv = (long) d;
-        if (lv != (long) (int) lv) {
+        if (lv != (int) lv) {
             throw new IllegalArgumentException("Exit code expression out of int range: " + d);
         }
         return (int) lv;
