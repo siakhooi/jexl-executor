@@ -25,21 +25,37 @@ class ExitCodeConverterTest {
 
     @Test
     void toProcessExitCode_rejectsNull() {
-        assertThrows(IllegalArgumentException.class, () -> ExitCodeConverter.toProcessExitCode(null));
+        assertThrows(IllegalArgumentException.class, this::rejectNullValue);
     }
 
     @Test
     void toProcessExitCode_rejectsString() {
-        assertThrows(IllegalArgumentException.class, () -> ExitCodeConverter.toProcessExitCode("1"));
+        assertThrows(IllegalArgumentException.class, this::rejectStringValue);
     }
 
     @Test
     void toProcessExitCode_rejectsFractionalDouble() {
-        assertThrows(IllegalArgumentException.class, () -> ExitCodeConverter.toProcessExitCode(1.5d));
+        assertThrows(IllegalArgumentException.class, this::rejectFractionalDouble);
     }
 
     @Test
     void toProcessExitCode_rejectsFractionalBigDecimal() {
-        assertThrows(IllegalArgumentException.class, () -> ExitCodeConverter.toProcessExitCode(new BigDecimal("2.1")));
+        assertThrows(IllegalArgumentException.class, this::rejectFractionalBigDecimal);
+    }
+
+    private void rejectNullValue() {
+        ExitCodeConverter.toProcessExitCode(null);
+    }
+
+    private void rejectStringValue() {
+        ExitCodeConverter.toProcessExitCode("1");
+    }
+
+    private void rejectFractionalDouble() {
+        ExitCodeConverter.toProcessExitCode(1.5d);
+    }
+
+    private void rejectFractionalBigDecimal() {
+        ExitCodeConverter.toProcessExitCode(new BigDecimal("2.1"));
     }
 }
