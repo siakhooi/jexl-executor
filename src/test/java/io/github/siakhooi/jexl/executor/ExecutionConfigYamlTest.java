@@ -9,11 +9,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class ExecutionConfigYamlTest {
+
+    @TempDir
+    Path tempDir;
 
     @Test
     void load_resolvesRelativePathsAgainstYamlDirectory(@TempDir Path tempDir) throws IOException {
@@ -61,69 +68,54 @@ class ExecutionConfigYamlTest {
         assertNull(spec.exitCodeExpr());
     }
 
-    @Test
-    void load_rejectsEmptyScriptFiles(@TempDir Path tempDir) throws IOException {
+    @ParameterizedTest
+    @MethodSource("invalidYamlConfigurations")
+    void load_rejectsInvalidYaml(String yamlContent, String expectedMessagePart) throws IOException {
         Path yaml = tempDir.resolve("bad.yaml");
-        Files.writeString(yaml, """
-                flows:
-                  default:
-                    contextFile: c.json
-                    scriptFiles: []
-                """);
+        Files.writeString(yaml, yamlContent);
 
         IOException ex = assertThrows(IOException.class, () -> ExecutionConfigYaml.load(yaml.toFile(), "default"));
-        assertTrue(ex.getMessage().contains("scriptFiles"));
+        assertTrue(ex.getMessage().contains(expectedMessagePart));
     }
 
-    @Test
-    void load_rejectsMissingFlows(@TempDir Path tempDir) throws IOException {
-        Path yaml = tempDir.resolve("bad.yaml");
-        Files.writeString(yaml, "resultPathTemplate: \"{name}\"\n");
-
-        IOException ex = assertThrows(IOException.class, () -> ExecutionConfigYaml.load(yaml.toFile(), "default"));
-        assertTrue(ex.getMessage().contains("flows"));
-    }
-
-    @Test
-    void load_rejectsLegacyRootPipelineFields(@TempDir Path tempDir) throws IOException {
-        Path yaml = tempDir.resolve("legacy.yaml");
-        Files.writeString(yaml, """
-                contextFile: c.json
-                scriptFiles:
-                  - s.jexl
-                """);
-
-        IOException ex = assertThrows(IOException.class, () -> ExecutionConfigYaml.load(yaml.toFile(), "default"));
-        assertTrue(ex.getMessage().contains("flows"));
-    }
-
-    @Test
-    void load_rejectsMissingContextFileOnFlow(@TempDir Path tempDir) throws IOException {
-        Path yaml = tempDir.resolve("bad.yaml");
-        Files.writeString(yaml, """
-                flows:
-                  default:
-                    scriptFiles:
-                      - a.jexl
-                """);
-
-        IOException ex = assertThrows(IOException.class, () -> ExecutionConfigYaml.load(yaml.toFile(), "default"));
-        assertTrue(ex.getMessage().contains("contextFile"));
-    }
-
-    @Test
-    void load_rejectsBlankScriptEntry(@TempDir Path tempDir) throws IOException {
-        Path yaml = tempDir.resolve("bad.yaml");
-        Files.writeString(yaml, """
-                flows:
-                  default:
-                    contextFile: c.json
-                    scriptFiles:
-                      - "   "
-                """);
-
-        IOException ex = assertThrows(IOException.class, () -> ExecutionConfigYaml.load(yaml.toFile(), "default"));
-        assertTrue(ex.getMessage().contains("scriptFiles"));
+    static Stream<Arguments> invalidYamlConfigurations() {
+        return Stream.of(
+                Arguments.arguments(
+                        """
+                                flows:
+                                  default:
+                                    contextFile: c.json
+                                    scriptFiles: []
+                                """,
+                        "scriptFiles"),
+                Arguments.arguments(
+                        "resultPathTemplate: \"{name}\"\n",
+                        "flows"),
+                Arguments.arguments(
+                        """
+                                contextFile: c.json
+                                scriptFiles:
+                                  - s.jexl
+                                """,
+                        "flows"),
+                Arguments.arguments(
+                        """
+                                flows:
+                                  default:
+                                    scriptFiles:
+                                      - a.jexl
+                                """,
+                        "contextFile"),
+                Arguments.arguments(
+                        """
+                                flows:
+                                  default:
+                                    contextFile: c.json
+                                    scriptFiles:
+                                      - "   "
+                                """,
+                        "scriptFiles")
+        );
     }
 
     @Test
