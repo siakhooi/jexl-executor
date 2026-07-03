@@ -33,7 +33,11 @@ class JarListFileResolverTest {
     @Test
     void resolve_bothNonNull_throwsIllegalArgumentException() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> JarListFileResolver.resolve(new File("/a.txt"), new File("/b.txt")));
+                this::resolveWithBothFiles);
         assertTrue(ex.getMessage().contains("not both"));
+    }
+
+    private void resolveWithBothFiles() {
+        JarListFileResolver.resolve(new File("/a.txt"), new File("/b.txt"));
     }
 }
