@@ -22,33 +22,39 @@ final class ExitCodeConverter {
             throw new IllegalArgumentException(
                     "Exit code expression must yield a number, got " + value.getClass().getSimpleName());
         }
-        if (num instanceof Double d) {
-            if (Double.isNaN(d) || Double.isInfinite(d) || d != Math.rint(d)) {
-                throw new IllegalArgumentException("Exit code expression must yield an integral number, got " + value);
-            }
-            return doubleWholeToInt(d);
+        return switch (num) {
+            case Double d -> floatingPointToInt(d, value);
+            case Float f -> floatingPointToInt(f.doubleValue(), value);
+            case BigDecimal bd -> bigDecimalToInt(bd, value);
+            case BigInteger bi -> bigIntegerToInt(bi, value);
+            default -> integralNumberToInt(num, value);
+        };
+    }
+
+    private static int floatingPointToInt(double d, Object value) {
+        if (Double.isNaN(d) || Double.isInfinite(d) || d != Math.rint(d)) {
+            throw new IllegalArgumentException("Exit code expression must yield an integral number, got " + value);
         }
-        if (num instanceof Float f) {
-            if (Float.isNaN(f) || Float.isInfinite(f) || f != Math.rint(f)) {
-                throw new IllegalArgumentException("Exit code expression must yield an integral number, got " + value);
-            }
-            return doubleWholeToInt(f.doubleValue());
+        return doubleWholeToInt(d);
+    }
+
+    private static int bigDecimalToInt(BigDecimal bd, Object value) {
+        try {
+            return bd.toBigIntegerExact().intValueExact();
+        } catch (ArithmeticException e) {
+            throw new IllegalArgumentException("Exit code expression must yield an integral number, got " + value, e);
         }
-        if (num instanceof BigDecimal bd) {
-            try {
-                return bd.toBigIntegerExact().intValueExact();
-            } catch (ArithmeticException e) {
-                throw new IllegalArgumentException("Exit code expression must yield an integral number, got " + value,
-                        e);
-            }
+    }
+
+    private static int bigIntegerToInt(BigInteger bi, Object value) {
+        try {
+            return bi.intValueExact();
+        } catch (ArithmeticException e) {
+            throw new IllegalArgumentException("Exit code expression out of int range: " + value, e);
         }
-        if (num instanceof BigInteger bi) {
-            try {
-                return bi.intValueExact();
-            } catch (ArithmeticException e) {
-                throw new IllegalArgumentException("Exit code expression out of int range: " + value, e);
-            }
-        }
+    }
+
+    private static int integralNumberToInt(Number num, Object value) {
         long lv = num.longValue();
         if (lv != (int) lv) {
             throw new IllegalArgumentException("Exit code expression out of int range: " + value);
