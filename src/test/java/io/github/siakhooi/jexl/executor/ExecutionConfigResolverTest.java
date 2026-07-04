@@ -68,9 +68,10 @@ class ExecutionConfigResolverTest {
         Files.writeString(tempDir.resolve("c.json"), "{}");
         Files.writeString(tempDir.resolve("s.jexl"), "1");
 
+        File yamlFile = yaml.toFile();
+        File contextFile = new File("/any/context.json");
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> ExecutionConfigResolver.resolve(yaml.toFile(), new File("/any/context.json"), null, "{name}", null,
-                        "default"));
+                () -> ExecutionConfigResolver.resolve(yamlFile, contextFile, null, "{name}", null, "default"));
         assertTrue(ex.getMessage().contains("not both"));
     }
 
@@ -87,9 +88,10 @@ class ExecutionConfigResolverTest {
         Files.writeString(tempDir.resolve("c.json"), "{}");
         Files.writeString(tempDir.resolve("s.jexl"), "1");
 
+        File yamlFile = yaml.toFile();
+        List<File> otherScripts = List.of(new File("/other.jexl"));
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> ExecutionConfigResolver.resolve(yaml.toFile(), null, List.of(new File("/other.jexl")), "{name}", null,
-                        "default"));
+                () -> ExecutionConfigResolver.resolve(yamlFile, null, otherScripts, "{name}", null, "default"));
         assertTrue(ex.getMessage().contains("not both"));
     }
 
@@ -102,23 +104,26 @@ class ExecutionConfigResolverTest {
 
     @Test
     void resolve_contextWithoutScripts_throwsIllegalArgumentException() {
+        File contextFile = new File("/ctx.json");
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> ExecutionConfigResolver.resolve(null, new File("/ctx.json"), null, "{name}", null, null));
+                () -> ExecutionConfigResolver.resolve(null, contextFile, null, "{name}", null, null));
         assertTrue(ex.getMessage().contains("Missing required parameters"));
     }
 
     @Test
     void resolve_contextWithEmptyScripts_throwsIllegalArgumentException() {
+        File contextFile = new File("/ctx.json");
+        List<File> emptyScripts = Collections.emptyList();
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> ExecutionConfigResolver.resolve(null, new File("/ctx.json"), Collections.emptyList(), "{name}", null,
-                        null));
+                () -> ExecutionConfigResolver.resolve(null, contextFile, emptyScripts, "{name}", null, null));
         assertTrue(ex.getMessage().contains("Missing required parameters"));
     }
 
     @Test
     void resolve_scriptsWithoutContext_throwsIllegalArgumentException() {
+        List<File> scripts = List.of(new File("/a.jexl"));
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> ExecutionConfigResolver.resolve(null, null, List.of(new File("/a.jexl")), "{name}", null, null));
+                () -> ExecutionConfigResolver.resolve(null, null, scripts, "{name}", null, null));
         assertTrue(ex.getMessage().contains("Missing required parameters"));
     }
 
@@ -126,8 +131,9 @@ class ExecutionConfigResolverTest {
     void resolve_missingYamlFile_throwsIOException(@TempDir Path tempDir) {
         Path missing = tempDir.resolve("does-not-exist.yaml");
 
+        File missingYaml = missing.toFile();
         assertThrows(IOException.class,
-                () -> ExecutionConfigResolver.resolve(missing.toFile(), null, null, "{name}", null, "default"));
+                () -> ExecutionConfigResolver.resolve(missingYaml, null, null, "{name}", null, "default"));
     }
 
     @Test
@@ -143,8 +149,9 @@ class ExecutionConfigResolverTest {
         Files.writeString(tempDir.resolve("c.json"), "{}");
         Files.writeString(tempDir.resolve("s.jexl"), "1");
 
+        File yamlFile = yaml.toFile();
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> ExecutionConfigResolver.resolve(yaml.toFile(), null, null, "{name}", "0", "default"));
+                () -> ExecutionConfigResolver.resolve(yamlFile, null, null, "{name}", "0", "default"));
         assertTrue(ex.getMessage().contains("--exit-code-expr"));
     }
 
