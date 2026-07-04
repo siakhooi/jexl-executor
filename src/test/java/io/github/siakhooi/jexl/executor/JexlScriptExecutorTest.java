@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import org.apache.commons.jexl3.JexlException;
@@ -58,5 +61,20 @@ class JexlScriptExecutorTest {
                 () -> executor.execute(context, script, "my-step.jexl"));
         assertTrue(ex.getMessage().contains("my-step.jexl"),
                 () -> "JEXL error message should include source label; got: " + ex.getMessage());
+    }
+
+    @Test
+    void testExecuteBindsStdoutAndStderr() {
+        ClassLoader cl = JexlScriptExecutorTest.class.getClassLoader();
+        JexlScriptExecutor executor = new JexlScriptExecutor(cl);
+        ByteArrayOutputStream captured = new ByteArrayOutputStream();
+        PrintStream prevOut = System.out;
+        System.setOut(new PrintStream(captured, true, StandardCharsets.UTF_8));
+        try {
+            executor.execute(Map.of(), "stdout.print('hello')", "stdout.jexl");
+            assertTrue(captured.toString(StandardCharsets.UTF_8).contains("hello"));
+        } finally {
+            System.setOut(prevOut);
+        }
     }
 }

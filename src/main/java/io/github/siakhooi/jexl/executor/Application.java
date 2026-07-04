@@ -15,6 +15,9 @@ public class Application {
     }
 
     public static void main(String[] args) {
-        System.exit(run(args));
+        int exitCode = run(args);
+        if (args.length > 0) {
+            System.exit(exitCode);
+        }
     }
 }
