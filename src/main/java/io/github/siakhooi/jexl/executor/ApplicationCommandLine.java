@@ -13,7 +13,12 @@ import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Spec;
 
-@Command(name = "jexl-executor", mixinStandardHelpOptions = true, version = Version.APPLICATION_VERSION, description = "Execute JEXL scripts with JSON context in a chain")
+@Command(name = "jexl-executor", mixinStandardHelpOptions = true, version = Version.APPLICATION_VERSION, description = "Execute JEXL scripts with JSON context in a chain", footer = {
+        "",
+        "Examples:",
+        "  jexl-executor context.json script1.jexl script2.jexl...",
+        "  jexl-executor --config [execution-config.yaml]",
+})
 public class ApplicationCommandLine implements Callable<Integer> {
 
     @Spec

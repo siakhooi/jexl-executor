@@ -2,9 +2,14 @@ package io.github.siakhooi.jexl.executor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -23,6 +28,38 @@ class ApplicationCommandLineTest {
                     scriptFiles:
                       - s.jexl
                 """;
+    }
+
+    @Test
+    void noArguments_printsUsageWithoutError() {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        PrintStream prevOut = System.out;
+        System.setOut(new PrintStream(out, true, StandardCharsets.UTF_8));
+        try {
+            int exit = Application.run(new String[0]);
+            assertEquals(0, exit);
+            String usage = out.toString(StandardCharsets.UTF_8);
+            assertTrue(usage.contains("Usage: jexl-executor"));
+            assertTrue(usage.contains("jexl-executor context.json script1.jexl script2.jexl..."));
+            assertTrue(usage.contains("jexl-executor --config [execution-config.yaml]"));
+            assertTrue(!usage.contains("Missing required parameters"));
+        } finally {
+            System.setOut(prevOut);
+        }
+    }
+
+    @Test
+    void help_includesCommonUsageExamples() {
+        CommandLine cmd = new CommandLine(new ApplicationCommandLine());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        cmd.setOut(new PrintWriter(out, true, StandardCharsets.UTF_8));
+
+        int exit = cmd.execute("--help");
+
+        assertEquals(0, exit);
+        String usage = out.toString(StandardCharsets.UTF_8);
+        assertTrue(usage.contains("jexl-executor context.json script1.jexl script2.jexl..."));
+        assertTrue(usage.contains("jexl-executor --config [execution-config.yaml]"));
     }
 
     @Test
