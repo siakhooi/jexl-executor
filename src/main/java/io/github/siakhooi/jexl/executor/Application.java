@@ -8,7 +8,7 @@ public class Application {
         CommandLine cmd = new CommandLine(new ApplicationCommandLine());
         cmd.setUsageHelpWidth(120);
         if (args.length == 0) {
-            cmd.usage(System.out);
+            cmd.usage(Console.out());
             return 0;
         }
         return cmd.execute(args);
