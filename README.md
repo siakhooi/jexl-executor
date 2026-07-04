@@ -41,6 +41,15 @@ Execute JEXL scripts with JSON context in a chain
 
 Either pass **positional** arguments (`<contextFile> <scriptFiles>...`) or an **execution config** YAML with `-c` / `--config` (not both). **`--config` or `-c` alone** loads **`execution-config.yaml`** from the current working directory; otherwise pass the file path (for example `-c ./my.yaml`). With `-c`, `resultPathTemplate` and `jarListFile` are read from the YAML root; **`flows.<id>`** holds each flow's `contextFile`, `scriptFiles`, and optional `exitCodeExpr`. Without **`--id`**, the flow id **`default`** is used (it must exist in the file unless you always pass **`--id`**). **`--id`** is only valid with **`-c`**; positional mode does not use flow ids. **`--result-path` / `-r`** applies only to positional mode. Optional **`jarListFile`** in the YAML is the same kind of file as **`--jarfile` / `-j`**; you must not set both the YAML field and `-j` at the same time. Exit code from JEXL: **`--exit-code-expr` / `-e`** is only for **positional** mode; with **`-c`**, set optional **`exitCodeExpr`** under the chosen flow (not with `-e`). Values may be inline JEXL or **`@file:path`** (YAML: paths relative to the YAML directory; CLI: relative to the current working directory). The expression runs on the **final merged context** and must evaluate to an integral number (non-numeric results are errors).
 
+### JEXL context
+
+Each script step runs against the merged JSON context plus two built-in bindings that are always injected before evaluation:
+
+- **`stdout`** — `System.out` (`PrintStream`)
+- **`stderr`** — `System.err` (`PrintStream`)
+
+Use them to print diagnostics or progress to the process standard streams without returning that output as the step result, for example `stdout.printf("total is %s%n", total)`. These names are reserved: they are not loaded from `<contextFile>` and always refer to the real JVM standard streams.
+
 ### Examples
 
 ```
