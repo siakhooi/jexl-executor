@@ -4,89 +4,24 @@ jexl scripts executor
 
 ## Usage
 
-```
-$ jexl-executor -h
-Usage: jexl-executor [-FhV] [--debug] [--jexl-debug] [-c[=[<execution-config.yaml>]]] [-e=<expr>] [--id=<id>]
-                     [-j=<jarListFile>] [--log-level=<level>] [-r=<resultPathTemplate>] [<contextFile>]
-                     [<scriptFiles>...]
-Execute JEXL scripts with JSON context in a chain
-      [<contextFile>]       Initial context JSON file (required unless --config/-c is set)
-      [<scriptFiles>...]    JEXL script or JSON files to execute in sequence (required unless --config/-c is set)
-  -c, --config[=[<execution-config.yaml>]]
-                            YAML execution config: global resultPathTemplate, jarListFile, and a flows map (each flow:
-                              contextFile, scriptFiles, optional exitCodeExpr). If -c or --config is given without a
-                              path, uses execution-config.yaml in the current working directory. Mutually exclusive
-                              with positional arguments; relative paths resolve against the YAML file's directory
-      --debug               Shorthand for --log-level debug
-  -e, --exit-code-expr=<expr>
-                            Positional mode only: JEXL expression on the final merged context, or @file:<path> to load
-                              JEXL from a file (relative paths use the current working directory). Integral numeric
-                              result becomes the process exit code. Not allowed with --config/-c (use exitCodeExpr
-                              in the execution config YAML instead).
-  -F, --full                Print full context instead of result
-  -h, --help                Show this help message and exit.
-      --id=<id>             With --config/-c only: which flow id under 'flows' to run (default: default). Not
-                              allowed without -c
-  -j, --jarfile=<jarListFile>
-                            File containing JAR paths (one per line) to load for JEXL scripts (mutually exclusive with
-                              jarListFile in an execution config YAML file)
-      --jexl-debug          Enable Apache Commons JEXL engine debug mode for richer diagnostics when a script fails
-                              (independent of --log-level)
-      --log-level=<level>   Root log level: trace, debug, info, warn, error, off, all (=trace) (default: info)
-  -r, --result-path=<resultPathTemplate>
-                            Path template for results. Use {name} as placeholder for script basename (default: {name}).
-                              Examples: {name}, output.{name}, results.{name}.data
-  -V, --version             Print version information and exit.
+There are 2 ways to run JEXL scripts,
+- in a chain against a shared JSON context. Pass files on the command line, or
+- use a YAML config file.
+
+**Command line** — context file, then scripts:
+
+```bash
+jexl-executor initial-context.json step1.jexl step2.json step3.jexl
 ```
 
-Either pass **positional** arguments (`<contextFile> <scriptFiles>...`) or an **execution config** YAML with `-c` / `--config` (not both). **`--config` or `-c` alone** loads **`execution-config.yaml`** from the current working directory; otherwise pass the file path (for example `-c ./my.yaml`). With `-c`, `resultPathTemplate` and `jarListFile` are read from the YAML root; **`flows.<id>`** holds each flow's `contextFile`, `scriptFiles`, and optional `exitCodeExpr`. Without **`--id`**, the flow id **`default`** is used (it must exist in the file unless you always pass **`--id`**). **`--id`** is only valid with **`-c`**; positional mode does not use flow ids. **`--result-path` / `-r`** applies only to positional mode. Optional **`jarListFile`** in the YAML is the same kind of file as **`--jarfile` / `-j`**; you must not set both the YAML field and `-j` at the same time. Exit code from JEXL: **`--exit-code-expr` / `-e`** is only for **positional** mode; with **`-c`**, set optional **`exitCodeExpr`** under the chosen flow (not with `-e`). Values may be inline JEXL or **`@file:path`** (YAML: paths relative to the YAML directory; CLI: relative to the current working directory). The expression runs on the **final merged context** and must evaluate to an integral number (non-numeric results are errors).
+**Config file** — execution config YAML (`-c` alone loads `execution-config.yaml` in the current directory):
 
-### JEXL context
-
-Each script step runs against the merged JSON context plus two built-in bindings that are always injected before evaluation:
-
-- **`stdout`** — `System.out` (`PrintStream`)
-- **`stderr`** — `System.err` (`PrintStream`)
-
-Use them to print diagnostics or progress to the process standard streams without returning that output as the step result, for example `stdout.printf("total is %s%n", total)`. These names are reserved: they are not loaded from `<contextFile>` and always refer to the real JVM standard streams.
-
-### Examples
-
-```
-$ jexl-executor initial-context.json step1.jexl step2.json step3.jexl
-
-$ jexl-executor -F initial-context.json step1.jexl step2.json step3.jexl
-
-$ jexl-executor -r 'output.{name}' initial-context.json step1.jexl step2.json step3.jexl
-
-$ jexl-executor -c ./execution-config.yaml
-
-$ jexl-executor -c
-
-$ jexl-executor -c ./execution-config.yaml --id release
+```bash
+jexl-executor -c ./execution-config.yaml
+jexl-executor -c
 ```
 
-### Execution config YAML (`-c` / `--config`)
-
-Paths in the YAML file may be relative; they are resolved against the **directory containing the YAML file**.
-
-```yaml
-jarListFile: jars.txt               # optional; same as --jarfile (do not use with -j)
-resultPathTemplate: "output.{name}" # optional; defaults to {name}
-flows:
-  default:                          # used when --id is omitted
-    contextFile: initial-context.json
-    scriptFiles:
-      - step1.jexl
-      - step2.json
-      - step3.jexl
-    exitCodeExpr: "status"          # optional; inline JEXL (do not use --exit-code-expr/-e with -c)
-  release:                          # optional second flow; run with --id release
-    contextFile: initial-context.json
-    scriptFiles:
-      - step1.jexl
-    exitCodeExpr: "@file:exit-code.jexl"
-```
+See the [User Guide](User-Guide.md) for options, execution config format, JEXL context bindings, and the full CLI reference.
 
 ## Installation
 
