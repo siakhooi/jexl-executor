@@ -3,6 +3,8 @@ package io.github.siakhooi.jexl.executor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import io.github.siakhooi.jexl.executor.config.ExecutionStep;
 import io.github.siakhooi.jexl.executor.config.ExecutionType;
@@ -24,10 +25,10 @@ class StepExecutorTest {
         Map<String, Object> context = new HashMap<>();
         context.put("foo", "bar");
 
-        ExecutionStep step = Mockito.mock(ExecutionStep.class);
-        Mockito.when(step.name()).thenReturn("testStep");
-        Mockito.when(step.scriptFile()).thenReturn(createTempScriptFile("1+1"));
-        Mockito.when(step.executionType()).thenReturn(ExecutionType.JEXL);
+        ExecutionStep step = mock(ExecutionStep.class);
+        when(step.name()).thenReturn("testStep");
+        when(step.scriptFile()).thenReturn(createTempScriptFile("1+1"));
+        when(step.executionType()).thenReturn(ExecutionType.JEXL);
 
         // Act
         StepExecutor.StepResult result = executor.executeStep(step, context);
@@ -43,10 +44,10 @@ class StepExecutorTest {
         Map<String, Object> context = new HashMap<>();
         context.put("foo", "bar");
 
-        ExecutionStep step = Mockito.mock(ExecutionStep.class);
-        Mockito.when(step.name()).thenReturn("jsonStep");
-        Mockito.when(step.scriptFile()).thenReturn(createTempScriptFile("{\"baz\":123}"));
-        Mockito.when(step.executionType()).thenReturn(ExecutionType.JSON);
+        ExecutionStep step = mock(ExecutionStep.class);
+        when(step.name()).thenReturn("jsonStep");
+        when(step.scriptFile()).thenReturn(createTempScriptFile("{\"baz\":123}"));
+        when(step.executionType()).thenReturn(ExecutionType.JSON);
 
         StepExecutor.StepResult result = executor.executeStep(step, context);
         assertNotNull(result.contextMap);
@@ -59,11 +60,11 @@ class StepExecutorTest {
         Map<String, Object> context = new HashMap<>();
         context.put("foo", "bar");
 
-        ExecutionStep step = Mockito.mock(ExecutionStep.class);
-        Mockito.when(step.name()).thenReturn("unknownStep");
-        Mockito.when(step.scriptFile()).thenReturn(createTempScriptFile("irrelevant"));
+        ExecutionStep step = mock(ExecutionStep.class);
+        when(step.name()).thenReturn("unknownStep");
+        when(step.scriptFile()).thenReturn(createTempScriptFile("irrelevant"));
         // Use a custom enum value that is not JEXL or JSON
-        Mockito.when(step.executionType()).thenReturn(ExecutionType.valueOf("UNKNOWN"));
+        when(step.executionType()).thenReturn(ExecutionType.valueOf("UNKNOWN"));
 
         StepExecutor.StepResult result = executor.executeStep(step, context);
         assertEquals(context, result.contextMap);
