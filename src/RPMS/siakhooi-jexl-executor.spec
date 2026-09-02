@@ -1,5 +1,5 @@
 Name:           siakhooi-jexl-executor
-Version:        1.6.3
+Version:        1.6.4
 Release:        1%{?dist}
 Summary:        jexl scripts executor
 
